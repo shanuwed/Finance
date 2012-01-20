@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:key="using_categories_in_root_screen"
+    android:title="@string/settings_prefscreen_title"
+    android:summary="@string/settings_prefscreen_summary">
+    
+    <PreferenceCategory 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="settings_topic_title"
+        android:title="@string/settings_title">
+        
+        <EditTextPreference
+            android:key="settings_xyz"
+            android:defaultValue="@string/settings_xyz_defaultvalue"
+            android:title="@string/settings_xyz_title"
+            android:summary="@string/settings_xyz_summary"
+            android:dialogTitle="Enter xyz" />
+        
+    </PreferenceCategory>
+    
+</PreferenceScreen>        
