@@ -16,5 +16,6 @@
     <string name="settings_xyz_summary">xyz-summary</string>
     
     <string name="no_data">No data</string>
+    <string name="error_already_in_progress">Task is already in progress</string>
         
 </resources>

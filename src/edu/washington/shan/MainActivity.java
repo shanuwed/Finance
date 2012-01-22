@@ -1,17 +1,19 @@
 package edu.washington.shan;
 
 import android.app.TabActivity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.SyncStateContract.Constants;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -27,15 +29,44 @@ public class MainActivity extends TabActivity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-	super.onCreate(savedInstanceState);
-	setContentView(R.layout.main);
-
-	//Resources res = getResources(); // Resource object to get Drawables
+    	super.onCreate(savedInstanceState);
+    	setContentView(R.layout.main);
+    
+    	//Resources res = getResources(); // Resource object to get Drawables
+    	
+    	// Create an Intent to launch an Activity for the tab (to be reused)
+    	addTab("market", "Market", new Intent().setClass(this, MarketActivity.class));
+    	addTab("stock", "Stock", new Intent().setClass(this, StockActivity.class));
+    	addTab("news", "News", new Intent().setClass(this, NewsActivity.class));
 	
-	// Create an Intent to launch an Activity for the tab (to be reused)
-	addTab("market", "Market", new Intent().setClass(this, MarketActivity.class));
-	addTab("stock", "Stock", new Intent().setClass(this, StockActivity.class));
-	addTab("news", "News", new Intent().setClass(this, NewsActivity.class));
+    	// TODO Check network connectivity
+    	//...
+    	
+        // When a tab changes check to see if new RSS feeds are available for
+        // the tab. Then sends a broadcast message to refresh the tab.
+        getTabHost().setOnTabChangedListener(mOnTabChangeListener);
+    }
+    
+    // TODO is this needed?
+    private TabHost.OnTabChangeListener mOnTabChangeListener = 
+        new TabHost.OnTabChangeListener(){
+
+            @Override
+            public void onTabChanged(String tabId) {
+                /* tabId == tabTag
+                */
+            }};
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+    }
+    
+    @Override
+    public void onResume()
+    {
+        super.onResume();
     }
     
     /**
