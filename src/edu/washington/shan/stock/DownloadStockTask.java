@@ -81,7 +81,7 @@ public class DownloadStockTask extends AsyncTask<String, Void, String> {
             }
             in.close();
             result = sb.toString();
-            //Log.v(TAG, result);
+            //Log.v(TAG, result); // Only to see raw xml dump
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
         } catch (URISyntaxException e) {
@@ -103,30 +103,21 @@ public class DownloadStockTask extends AsyncTask<String, Void, String> {
      */
     protected void onPostExecute(String result) {
         Log.v(TAG, "onPostExecute");
-        /*
-        if (result == null || result.length() < 10) {
-            Log.e(TAG, "onPostExecute: result is invalid");
-            Toast.makeText(mContext, "Portfolio could not be updated.",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }*/
         
         String ret = "fail"; // TODO make it a boolean??
         
         if(result != null && result.length() > 10){
 
-            Stock[] stocks = null;
             try {
-                stocks = Stock.parse(result);
+                Stock[] stocks = Stock.parse(result);
+                if (stocks != null && stocks.length > 0){
+                    Stock.storeToDatabase(mContext, stocks);
+                    ret = "success";
+                }
             } catch (XmlPullParserException e) {
                 Log.e(TAG, e.getMessage(), e);
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage(), e);
-            }
-            if (stocks != null){
-                for (Stock stock : stocks)
-                    stock.storeToDatabase(mContext);
-                ret = "success";
             }
         }
         

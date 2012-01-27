@@ -29,7 +29,7 @@ import org.apache.http.client.methods.HttpHead;
 import java.io.IOException;
 
 public class CookieStore {
-    private static final String LOG_TAG = "Shelves";
+    private static final String LOG_TAG = "CookieStore";
 
     private static final CookieStore sCookieStore;
     static {

@@ -211,32 +211,26 @@ public class Stock {
         return stocks.toArray(new Stock[]{});
     }
     
-    /**
-     * Returns -1 if it fails to add a new symbol to db
-     * @param mContext
-     * @return
-     */
-    public long storeToDatabase(Context mContext){
-        long result = -1;
-        DBAdapter dbAdapter = new DBAdapter(mContext);
+    public static void storeToDatabase(Context context, Stock[] stocks){
+        DBAdapter dbAdapter = new DBAdapter(context);
         try{
             dbAdapter.open();
-            if(null == dbAdapter.fetchItemsBySymbol(symbol)){
-                result = dbAdapter.createItem(this);
-                if(result != -1){
-                    Log.v(TAG, "successfully added to db " + this.symbol);
+            for(Stock stock : stocks){
+                String symbol = stock.symbol;
+                if(!dbAdapter.doesItemExist(symbol)){
+                    if(dbAdapter.createItem(stock) != -1){
+                        Log.v(TAG, "successfully added to db " + symbol);
+                    }else{
+                        Log.e(TAG, "failed to add to db " + symbol);
+                    }
                 }else{
-                    Log.e(TAG, "failed to add to db " + this.symbol);
+                    Log.v(TAG, "item already exists in db " + symbol);
+                    dbAdapter.updateItem(stock);
                 }
-            }else{
-                Log.v(TAG, "item already exists in db " + this.symbol);
-                // TODO update the existing item
-                dbAdapter.updateItem(this);
             }
         }finally{
             dbAdapter.close();
         }
-        return result;
     }
 
 }

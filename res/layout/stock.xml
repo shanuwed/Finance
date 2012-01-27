@@ -8,9 +8,10 @@
 	    style="?android:attr/listSeparatorTextViewStyle"
 	    android:id="@+android:id/title"
 	    android:text="Portfolio"/>
-    
+
     <FrameLayout
         android:id="@+id/frameLayout1"
+        android:layout_weight="1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
     
@@ -28,4 +29,10 @@
 
     </FrameLayout>
 
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Ticker" />
+    
 </LinearLayout>

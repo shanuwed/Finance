@@ -22,22 +22,26 @@ public class MainActivity extends TabActivity {
 
     private static final String TAG = "MainActivity";
     private static final int ACTIVITY_SETTINGS = 0;
-    private Thread mWorkerThread;
-    private Handler mHandler;
-    private ProgressBar mProgressBar;
+    //private Thread mWorkerThread;
+    //private Handler mHandler;
+    //private ProgressBar mProgressBar;
+    private static final int MENU_ADD = 1;
+    private static final int MENU_SUBS = 2;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.v(TAG, "onCreate");
+        
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.main);
     
     	//Resources res = getResources(); // Resource object to get Drawables
     	
     	// Create an Intent to launch an Activity for the tab (to be reused)
-    	addTab("market", "Market", new Intent().setClass(this, MarketActivity.class));
-    	addTab("stock", "Stock", new Intent().setClass(this, StockActivity.class));
-    	addTab("news", "News", new Intent().setClass(this, NewsActivity.class));
+    	addTab(Consts.TABTAB_MARKET, "Market", new Intent().setClass(this, MarketActivity.class));
+    	addTab(Consts.TABTAB_STOCK, "Stock", new Intent().setClass(this, StockActivity.class));
+    	addTab(Consts.TABTAB_NEWS, "News", new Intent().setClass(this, NewsActivity.class));
 	
     	// TODO Check network connectivity
     	//...
@@ -71,29 +75,36 @@ public class MainActivity extends TabActivity {
     
     /**
      * Add a new tab to TabActivity
+     * 
      * @param tag
      * @param caption
      * @param intent
      */
-    private void addTab(String tag, String caption, Intent intent){
-	TabHost.TabSpec spec = getTabHost().newTabSpec(tag).setIndicator(createTabIndicator(this, caption)).setContent(intent);
-	getTabHost().addTab(spec);
+    private void addTab(String tag, String caption, Intent intent) {
+        TabHost.TabSpec spec = getTabHost().newTabSpec(tag).setIndicator(
+                createTabIndicator(this, caption)).setContent(intent);
+        getTabHost().addTab(spec);
     }
-    
+
     /**
      * To customize see http://joshclemm.com/blog/?p=136 and
-     * http://androidworkz.com/2011/02/04/custom-menu-bar-tabs-how-to-hook-the-menu-button-to-showhide-a-custom-tab-bar/
+     * http://androidworkz.
+     * com/2011/02/04/custom-menu-bar-tabs-how-to-hook-the-menu
+     * -button-to-showhide-a-custom-tab-bar/
+     * 
      * @param context
      * @param caption
      * @return
      */
-    private static View createTabIndicator(final Context context, final String caption) {
-    	View view = LayoutInflater.from(context).inflate(R.layout.tab_indicator, null);
-    	TextView v = (TextView) view.findViewById(R.id.tab_indicator_text);
-    	v.setText(caption);
-    	return view;
+    private static View createTabIndicator(final Context context,
+            final String caption) {
+        View view = LayoutInflater.from(context).inflate(
+                R.layout.tab_indicator, null);
+        TextView v = (TextView) view.findViewById(R.id.tab_indicator_text);
+        v.setText(caption);
+        return view;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -101,9 +112,25 @@ public class MainActivity extends TabActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-	MenuInflater inflater = getMenuInflater();
-	inflater.inflate(R.menu.mainmenu, menu);
-	return true;
+        String tabTag = getTabHost().getCurrentTabTag();
+        if(tabTag.equals(Consts.TABTAB_MARKET)){
+            // Add a tab specific menu if needed
+        }else if(tabTag.equals(Consts.TABTAB_NEWS)){
+            menu.add(Menu.NONE, MENU_SUBS, 0, "Subscription"). // TODO add to string resource
+                setIcon(R.drawable.ic_menu_pref);
+            menu.add(Menu.NONE, MENU_SUBS, 0, "Search").
+                setIcon(R.drawable.ic_menu_search);
+            menu.add(Menu.NONE, MENU_SUBS, 0, "Refresh").
+                setIcon(R.drawable.ic_menu_refresh);
+        }else if(tabTag.equals(Consts.TABTAB_STOCK)){
+            menu.add(Menu.NONE, MENU_ADD, 0, "Add Ticker").
+                setIcon(R.drawable.ic_menu_plus);
+        }
+        
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.mainmenu, menu);
+        
+        return true;
     }
 
     /*

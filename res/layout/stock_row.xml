@@ -4,14 +4,76 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/stock_row_text1"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceLarge"
-    android:gravity="center_vertical"
-    android:paddingLeft="6dip"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-/>
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/stock_row_text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingLeft="6dip"
+            android:paddingTop="2dip"
+            android:text="text1" />
+
+        <TextView
+            android:id="@+id/stock_row_text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center_vertical"
+            android:maxLines="1"
+            android:paddingLeft="30dip"
+            android:paddingTop="2dip"
+            android:text="text2"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:gravity="right"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/stock_row_text3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right"
+                android:maxLines="1"
+                android:paddingLeft="6dip"
+                android:paddingTop="2dip"
+                android:text="text3" />
+
+            <TextView
+                android:id="@+id/stock_row_text4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:gravity="right"
+                android:maxLines="1"
+                android:paddingLeft="6dip"
+                android:paddingRight="10dip"
+                android:paddingTop="2dip"
+                android:text="text4" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/stock_row_text_company_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingBottom="2dip"
+        android:paddingLeft="6dip"
+        android:text="company_name" />
 
 </LinearLayout>

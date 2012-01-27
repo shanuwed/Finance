@@ -150,7 +150,7 @@ public class DBAdapter {
      */
     public Cursor fetchAllItems() {
 
-        return mDb.query(DBConstants.TABLE_NAME, new String[] {
+        Cursor cursor = mDb.query(DBConstants.TABLE_NAME, new String[] {
     		DBConstants.KEY_ID, 
     		DBConstants.symbol_NAME,
     		DBConstants.pretty_symbol_NAME,
@@ -195,6 +195,28 @@ public class DBAdapter {
     		null,
     		null,
     		null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+    
+    public boolean doesItemExist(String symbol) {
+        boolean result = false;
+        Cursor cursor = null;
+        try {
+            cursor = mDb.query(true, DBConstants.TABLE_NAME, new String[] {
+                    DBConstants.KEY_ID, DBConstants.symbol_NAME },
+                    DBConstants.symbol_NAME + "='" + symbol + "'", null, null,
+                    null, null, null);
+            if (cursor != null && cursor.getCount() >= 1) {
+                result = true;
+            }
+        } finally {
+            if(cursor != null)
+                cursor.close();
+        }
+        return result;
     }
     
     /**
@@ -210,7 +232,44 @@ public class DBAdapter {
 
             mDb.query(true, DBConstants.TABLE_NAME, new String[] {
             		DBConstants.KEY_ID,
-                    DBConstants.symbol_NAME}, 
+                    DBConstants.symbol_NAME,
+                    DBConstants.pretty_symbol_NAME,
+                    DBConstants.symbol_lookup_url_NAME,
+                    DBConstants.company_NAME,
+                    DBConstants.exchange_NAME,
+                    DBConstants.exchange_timezone_NAME,
+                    DBConstants.exchange_utc_offset_NAME,
+                    DBConstants.exchange_closing_NAME,
+                    DBConstants.divisor_NAME,
+                    DBConstants.currency_NAME,
+                    DBConstants.last_NAME,
+                    DBConstants.high_NAME,
+                    DBConstants.low_NAME,
+                    DBConstants.volume_NAME,
+                    DBConstants.avg_volume_NAME,
+                    DBConstants.market_cap_NAME,
+                    DBConstants.open_NAME,
+                    DBConstants.y_close_NAME,
+                    DBConstants.change_NAME,
+                    DBConstants.perc_change_NAME,
+                    DBConstants.delay_NAME,
+                    DBConstants.trade_timestamp_NAME,
+                    DBConstants.trade_date_utc_NAME,
+                    DBConstants.trade_time_utc_NAME,
+                    DBConstants.current_date_utc_NAME,
+                    DBConstants.current_time_utc_NAME,
+                    DBConstants.symbol_url_NAME,
+                    DBConstants.chart_url_NAME,
+                    DBConstants.disclaimer_url_NAME,
+                    DBConstants.ecn_url_NAME,
+                    DBConstants.isld_last_NAME,
+                    DBConstants.isld_trade_date_utc_NAME,
+                    DBConstants.isld_trade_time_utc_NAME,
+                    DBConstants.brut_last_NAME,
+                    DBConstants.brut_trade_date_utc_NAME,
+                    DBConstants.brut_trade_time_utc_NAME,
+                    DBConstants.daylight_savings_NAME
+                    }, 
                     DBConstants.symbol_NAME + "='" + symbol + "'", 
                     null,
                     null,
@@ -223,9 +282,64 @@ public class DBAdapter {
         return cursor;
     }
 
-    public void updateItem(Stock stock) {
-        // TODO void DBAdapter.updateItem(Stock stock)
+    /**
+     * Takes a stock object and updates it in the db.
+     * If stock object being updated does not exist, it won't create or update anything.
+     * Returns a number of rows affected
+     * @param stock
+     * @return
+     */
+    public int updateItem(Stock stock) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DBConstants.symbol_NAME, stock.symbol);
+        contentValues.put(DBConstants.pretty_symbol_NAME, stock.pretty_symbol);
+        contentValues
+                .put(DBConstants.symbol_lookup_url_NAME, stock.symbol_lookup_url);
+        contentValues.put(DBConstants.company_NAME, stock.company);
+        contentValues.put(DBConstants.exchange_NAME, stock.exchange);
+        contentValues
+                .put(DBConstants.exchange_timezone_NAME, stock.exchange_timezone);
+        contentValues.put(DBConstants.exchange_utc_offset_NAME,
+                stock.exchange_utc_offset);
+        contentValues.put(DBConstants.exchange_closing_NAME, stock.exchange_closing);
+        contentValues.put(DBConstants.divisor_NAME, stock.divisor);
+        contentValues.put(DBConstants.currency_NAME, stock.currency);
+        contentValues.put(DBConstants.last_NAME, stock.last);
+        contentValues.put(DBConstants.high_NAME, stock.high);
+        contentValues.put(DBConstants.low_NAME, stock.low);
+        contentValues.put(DBConstants.volume_NAME, stock.volume);
+        contentValues.put(DBConstants.avg_volume_NAME, stock.avg_volume);
+        contentValues.put(DBConstants.market_cap_NAME, stock.market_cap);
+        contentValues.put(DBConstants.open_NAME, stock.open);
+        contentValues.put(DBConstants.y_close_NAME, stock.y_close);
+        contentValues.put(DBConstants.change_NAME, stock.change);
+        contentValues.put(DBConstants.perc_change_NAME, stock.perc_change);
+        contentValues.put(DBConstants.delay_NAME, stock.delay);
+        contentValues.put(DBConstants.trade_timestamp_NAME, stock.trade_timestamp);
+        contentValues.put(DBConstants.trade_date_utc_NAME, stock.trade_date_utc);
+        contentValues.put(DBConstants.trade_time_utc_NAME, stock.trade_time_utc);
+        contentValues.put(DBConstants.current_date_utc_NAME, stock.current_date_utc);
+        contentValues.put(DBConstants.current_time_utc_NAME, stock.current_time_utc);
+        contentValues.put(DBConstants.symbol_url_NAME, stock.symbol_url);
+        contentValues.put(DBConstants.chart_url_NAME, stock.chart_url);
+        contentValues.put(DBConstants.disclaimer_url_NAME, stock.disclaimer_url);
+        contentValues.put(DBConstants.ecn_url_NAME, stock.ecn_url);
+        contentValues.put(DBConstants.isld_last_NAME, stock.isld_last);
+        contentValues.put(DBConstants.isld_trade_date_utc_NAME,
+                stock.isld_trade_date_utc);
+        contentValues.put(DBConstants.isld_trade_time_utc_NAME,
+                stock.isld_trade_time_utc);
+        contentValues.put(DBConstants.brut_last_NAME, stock.brut_last);
+        contentValues.put(DBConstants.brut_trade_date_utc_NAME,
+                stock.brut_trade_date_utc);
+        contentValues.put(DBConstants.brut_trade_time_utc_NAME,
+                stock.brut_trade_time_utc);
+        contentValues.put(DBConstants.daylight_savings_NAME, stock.daylight_savings);
         
+        // returns number of rows affected
+        return mDb.update(DBConstants.TABLE_NAME, contentValues, 
+                DBConstants.symbol_NAME + "==?", 
+                new String[]{stock.symbol}); // where args
     }
     
 }

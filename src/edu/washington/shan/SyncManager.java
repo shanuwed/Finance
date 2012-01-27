@@ -4,103 +4,92 @@
 package edu.washington.shan;
 
 import java.util.Calendar;
-import java.util.Hashtable;
-import java.util.Map;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import edu.washington.shan.stock.DownloadStockTask;
-import edu.washington.shan.util.UIUtilities;
 
 /**
  * @author shan@uw.edu
  *
  */
-public class SyncManager {
+public class SyncManager implements AsyncTaskCompleteListener<String> {
     
     private static final String TAG="SyncManager";
+    
     private final long mIntervalInMillisec = 240000L; // 4 min
     private Context mContext;
-    private Map<String, SyncRecord> mRecords ;
-    private DownloadStockTask mDownloadTask;
     private AsyncTaskCompleteListener<String> mCallback;
+    private boolean mDownloadStatus; // true = successful download
+    private long mLastSyncedInMillisec;
+    private DownloadStockTask mDownloadTask;
     
     public SyncManager(Context context, AsyncTaskCompleteListener<String> callback){
         mContext = context;
         mCallback = callback;
-        mRecords = new Hashtable<String, SyncRecord>();
+        mDownloadStatus = false; // initialize to false to force sync first time around
     }
     
-    public void sync(String key){
-        Log.v(TAG, "sync for " + key);
-        if(mRecords.containsKey(key)){
-            SyncRecord r = mRecords.get(key);
-            if(false == r.getStatus()){
-                // if the last sync status "failed" try to sync again
-                downloadStockData();
-            }else{
-                // the last sync status was "successful"
-                // check how long it's been since the last successful sync
-                long last = r.getWhen();
-                long now = Calendar.getInstance().getTimeInMillis();
-                if(now - last > mIntervalInMillisec){
-                    downloadStockData();
-                }
-            }
+
+    public void setContext(Context context, 
+            AsyncTaskCompleteListener<String> callback){
+        mContext = context;
+        mCallback = callback;
+    }
+    
+    /**
+     * It syncs for all given keys (stock symbols)
+     * @param keys
+     */
+    public void sync(String... keys){
+        Log.v(TAG, "attempting to sync");
+        
+        if(!mDownloadStatus){
+            // if the last sync status "failed" try to sync again
+            downloadStockData(keys);
         }else{
-            mRecords.put(key, new SyncRecord(key));
-            // First time
-            downloadStockData();
+            // the last sync status was "successful"
+            // check how long it's been since the last successful sync
+            long now = Calendar.getInstance().getTimeInMillis();
+            if(now - mLastSyncedInMillisec > mIntervalInMillisec){
+                downloadStockData(keys);
+            }
         }
     }
     
-    private void downloadStockData() {
+    private void downloadStockData(String... keys) {
         Log.v(TAG, "downloadStockData");
+        
         if (mDownloadTask == null
                 || mDownloadTask.getStatus() == AsyncTask.Status.FINISHED) {
-            mDownloadTask = new DownloadStockTask(mContext, mCallback);
-            mDownloadTask.execute("AAPL");
+            mDownloadTask = new DownloadStockTask(mContext, this);
+            mDownloadTask.execute(keys);
         } else {
-            UIUtilities.showToast(mContext,
-                    R.string.error_already_in_progress);
+            // TODO need to rethink the logic here...
+            // what does it mean if mDownloadTask != null. Can we restart the same async task?
+            //UIUtilities.showToast(mContext,
+            //        R.string.error_already_in_progress);
+            Log.v(TAG, "download is already in progress");
         }
     }
-    
-    private class SyncRecord{
+
+    @Override
+    public void onTaskComplete(String result) {
+        Log.v(TAG, "onTaskComplete");
         
-        private String mKey;
-        private Object mLock = new Object();
-        private long mWhen;
-        private boolean mStatus;
+        // If async task finished successfully 
+        // update the last sync time and status. 
+        if(result.equals("success")){
+            mLastSyncedInMillisec = Calendar.getInstance().getTimeInMillis();
+            mDownloadStatus = true;
+        }else{
+            mDownloadStatus = false;
+        }
         
-        public SyncRecord(String key){
-            synchronized(mLock){
-                mKey = key;
-                mStatus = true; // TODO status is always true for now - need to change
-                markTime();
-            }
-        }
-        public boolean getStatus() {
-            synchronized(mLock){
-                return mStatus;
-            }
-        }
-        public void markTime(){
-            synchronized(mLock){
-                Calendar c = Calendar.getInstance();
-                mWhen = c.getTimeInMillis();
-            }
-        }
-        public void setStatus(boolean status) {
-            synchronized (mLock) {
-                mStatus = status;
-            }
-        }
-        public long getWhen(){
-            synchronized(mLock){
-                return mWhen;
-            }
+        // Notify the client that it's finished.
+        if(mCallback != null){
+            mCallback.onTaskComplete(result);
         }
     }
 }

@@ -50,7 +50,7 @@ public class HttpManager {
 
         HttpClientParams.setRedirecting(params, false);
 
-        HttpProtocolParams.setUserAgent(params, "Shelves/1.1");
+        HttpProtocolParams.setUserAgent(params, "Finance/1.1");
 
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
