@@ -15,15 +15,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.xmlpull.v1.XmlPullParserException;
 
-import edu.washington.shan.AsyncTaskCompleteListener;
-import edu.washington.shan.Consts;
-
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.provider.SyncStateContract.Constants;
 import android.util.Log;
-import android.widget.Toast;
+import edu.washington.shan.AsyncTaskCompleteListener;
 
 /**
  * @author shan@uw.edu

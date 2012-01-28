@@ -39,7 +39,7 @@ public class SyncManager implements AsyncTaskCompleteListener<String> {
     }
     
     /**
-     * It syncs for all given keys (stock symbols)
+     * It syncs for all given stock symbols
      * @param keys
      */
     public void sync(String... keys){
@@ -54,8 +54,14 @@ public class SyncManager implements AsyncTaskCompleteListener<String> {
             long now = Calendar.getInstance().getTimeInMillis();
             if(now - mLastSyncedInMillisec > mIntervalInMillisec){
                 downloadStockData(keys);
+            }else{
+                Log.v(TAG, "won't sync because it hasn't been long enough since the last sync");
             }
         }
+    }
+    
+    public void syncForce(String symbol){
+        downloadStockData(new String[]{symbol});
     }
     
     private void downloadStockData(String... keys) {

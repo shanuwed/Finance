@@ -4,33 +4,30 @@
 package edu.washington.shan;
 
 import android.app.ListActivity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.SimpleCursorAdapter;
+import edu.washington.shan.stock.CustomViewBinder;
 import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
 
 /**
- * @author shan@uw.edu
+ * Handles the Stock tab
  * 
  */
-public class StockActivity extends ListActivity implements AsyncTaskCompleteListener<String> {
+public class StockActivity extends ListActivity {
     
     private static final String TAG = "StockActivity";
-    private SyncManager mSyncMan;
     private DBAdapter mDbAdapter;
     private CustomViewBinder mCustomViewBinder;
+    private RefreshBroadcastReceiver refreshBroadcastReceiver;
     
-    // TODO get the symbols dynamically...
-    private static final String[] symbols = 
-        new String[]{"IBM","MSFT","YHOO","GOOG","AMZN","DIA","TEVA","FNF","VAR"};
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.app.Activity#onCreate(android.os.Bundle)
-     */
+    /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
@@ -39,43 +36,39 @@ public class StockActivity extends ListActivity implements AsyncTaskCompleteList
         setContentView(R.layout.stock);
         
         mCustomViewBinder = new CustomViewBinder(this);
+        refreshBroadcastReceiver = new RefreshBroadcastReceiver();
         
-        // Immediately display the list from the database
+        // Display the list from the database
         mDbAdapter = new DBAdapter(this);
         mDbAdapter.open();
         fillData();
-
-        // Check to see if we're restarting with a sync manager.
-        // If so, restore the sync manager instance.
-        if(null != (mSyncMan = (SyncManager)getLastNonConfigurationInstance())){
-            mSyncMan.setContext(this, this);
-        }else{
-            mSyncMan = new SyncManager(this, this);
-            mSyncMan.sync(symbols); // TODO DEBUG ONLY
-        }
         
+        registerReceiver(refreshBroadcastReceiver, 
+                new IntentFilter(Consts.REFRESH_STOCK_VIEW));
     }
     
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.app.Activity#onPause()
+    /**
+     * Unregister the broadcast receiver
      */
     @Override
     protected void onPause() {
+        unregisterReceiver(refreshBroadcastReceiver);
         super.onPause();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see android.app.Activity#onResume()
+    /**
+     * Re-register the broadcast receiver
      */
     @Override
     protected void onResume() {
+        registerReceiver(refreshBroadcastReceiver, 
+                new IntentFilter(Consts.REFRESH_STOCK_VIEW));
         super.onResume();
     }
 
+    /**
+     * Clean up the adapter
+     */
     @Override
     public void onDestroy()
     {
@@ -83,25 +76,9 @@ public class StockActivity extends ListActivity implements AsyncTaskCompleteList
         super.onDestroy();
     }
 
-    /* 
-     * This gets called before onDestroy(). 
-     * Pass forward a reference to sync manager which contains async task
+    /**
+     * Populate the list view from the data in db
      */
-    @Override
-    public Object onRetainNonConfigurationInstance() {
-        return mSyncMan;
-    }
-
-    @Override
-    public void onTaskComplete(String result) {
-        Log.v(TAG, "onTaskComplete");
-        
-        // BUGBUG if you try to update the UI here it throws
-        // java.lang.IllegalStateException: attempt to acquire a reference on a close SQLiteClosable
-        // TODO need a better way to update the UI 
-        //fillData(); 
-    }
-
     private void fillData() {
         try {
             // Get the rows from the database and create the item list
@@ -138,4 +115,22 @@ public class StockActivity extends ListActivity implements AsyncTaskCompleteList
         }
 
     }    
+    
+    /**
+     * Upon receiving a broadcast message,
+     * refresh the list view.
+     */
+    public class RefreshBroadcastReceiver extends BroadcastReceiver 
+    {
+        @Override
+        public void onReceive(Context context, Intent intent) 
+        {
+            String action = intent.getAction();
+            if(action.equals(Consts.REFRESH_STOCK_VIEW))
+            {
+                Log.v(TAG, "RefreshBroadcastReceiver");
+                fillData();
+            }
+        }
+    }
 }

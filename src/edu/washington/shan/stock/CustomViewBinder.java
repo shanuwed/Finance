@@ -1,5 +1,6 @@
-package edu.washington.shan;
+package edu.washington.shan.stock;
 
+import edu.washington.shan.R;
 import android.content.Context;
 import android.database.Cursor;
 import android.view.View;
