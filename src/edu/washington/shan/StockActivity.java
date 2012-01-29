@@ -12,7 +12,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.SimpleCursorAdapter;
-import edu.washington.shan.stock.CustomViewBinder;
+import edu.washington.shan.stock.StockViewBinder;
 import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
 
@@ -24,7 +24,7 @@ public class StockActivity extends ListActivity {
     
     private static final String TAG = "StockActivity";
     private DBAdapter mDbAdapter;
-    private CustomViewBinder mCustomViewBinder;
+    private StockViewBinder mCustomViewBinder;
     private RefreshBroadcastReceiver refreshBroadcastReceiver;
     
     /** Called when the activity is first created. */
@@ -35,7 +35,7 @@ public class StockActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stock);
         
-        mCustomViewBinder = new CustomViewBinder(this);
+        mCustomViewBinder = new StockViewBinder(this);
         refreshBroadcastReceiver = new RefreshBroadcastReceiver();
         
         // Display the list from the database
@@ -128,7 +128,7 @@ public class StockActivity extends ListActivity {
             String action = intent.getAction();
             if(action.equals(Consts.REFRESH_STOCK_VIEW))
             {
-                Log.v(TAG, "RefreshBroadcastReceiver");
+                Log.v(TAG, "RefreshBroadcastReceiver for stocks");
                 fillData();
             }
         }

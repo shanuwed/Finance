@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:key="using_categories_in_root_screen"
+    android:title="@string/settings_prefscreen_title"
+    android:summary="settings_prefscreen_summary">
+    
+    <PreferenceCategory 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="subscriptionoptions_topic_newstopic"
+        android:title="@string/title_newstopic">
+        
+        <CheckBoxPreference
+            android:key="usmarkets"
+            android:title="@string/title_usmarkets" android:enabled="false" android:selectable="false" android:summary="This option is always selected."/>
+        
+        <CheckBoxPreference
+            android:key="mostpopular"
+            android:title="@string/title_mostpopular"/>
+        
+        <CheckBoxPreference
+            android:key="investingstrategies"
+            android:title="@string/title_investingstrategies"/>
+        
+        <CheckBoxPreference
+            android:key="taxes"
+            android:title="@string/title_taxes"/>
+        
+    </PreferenceCategory>
+    
+    <PreferenceCategory 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="subscriptionoptions_topic_basicmaterials"
+        android:title="@string/title_basicmaterials">
+        
+        <CheckBoxPreference
+            android:key="OilGasRefiningMarketing"
+            android:title="@string/title_OilGasRefiningMarketing"/>
+        
+        <CheckBoxPreference
+            android:key="Gold"
+            android:title="@string/title_Gold"/>
+        
+        <CheckBoxPreference
+            android:key="Silver"
+            android:title="@string/title_Silver"/>
+        
+        <CheckBoxPreference
+            android:key="SteelIron"
+            android:title="@string/title_SteelIron"/>
+                
+        <CheckBoxPreference
+            android:key="Synthetics"
+            android:title="@string/title_Synthetics"/>
+        
+    </PreferenceCategory>
+    
+    
+    <PreferenceCategory 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="subscriptionoptions_topic_financial"
+        android:title="@string/title_financial">
+        
+        <CheckBoxPreference
+            android:key="AssetManagement"
+            android:title="@string/title_AssetManagement"/>
+        
+        <CheckBoxPreference
+            android:key="RealEstateDevelopment"
+            android:title="@string/title_RealEstateDevelopment"/>
+        
+        <CheckBoxPreference
+            android:key="CreditServices"
+            android:title="@string/title_CreditServices"/>
+        
+        <CheckBoxPreference
+            android:key="LifeInsurance"
+            android:title="@string/title_LifeInsurance"/>
+                
+        <CheckBoxPreference
+            android:key="SavingsLoans"
+            android:title="@string/title_SavingsLoans"/>
+        
+    </PreferenceCategory>
+
+            
+    <PreferenceCategory 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="subscriptionoptions_topic_healthcare"
+        android:title="@string/title_healthcare">
+        
+        <CheckBoxPreference
+            android:key="HealthCarePlans"
+            android:title="@string/title_HealthCarePlans"/>
+        
+        <CheckBoxPreference
+            android:key="Hospitals"
+            android:title="@string/title_Hospitals"/>
+        
+        <CheckBoxPreference
+            android:key="MedicalInstrumentsSupplies"
+            android:title="@string/title_MedicalInstrumentsSupplies"/>
+        
+    </PreferenceCategory>
+        
+            
+    <PreferenceCategory 
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:key="subscriptionoptions_topic_technology"
+        android:title="@string/title_technology">
+        
+        <CheckBoxPreference
+            android:key="ApplicationSoftware"
+            android:title="@string/title_ApplicationSoftware"/>
+        
+        <CheckBoxPreference
+            android:key="HealthcareInformationServices"
+            android:title="@string/title_HealthcareInformationServices"/>
+        
+        <CheckBoxPreference
+            android:key="InternetSoftwareServices"
+            android:title="@string/title_InternetSoftwareServices"/>
+        
+        <CheckBoxPreference
+            android:key="WirelessCommunications"
+            android:title="@string/title_WirelessCommunications"/>
+        
+    </PreferenceCategory>
+        
+        
+</PreferenceScreen>        

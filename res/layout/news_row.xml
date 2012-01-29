@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+<ImageView
+    android:id="@+id/rss_row_thumbImage"
+    android:layout_width="32dip"
+    android:layout_height="fill_parent"
+    android:padding="2dip"
+    android:src="@drawable/star_orange_frame" />
+
+	<LinearLayout
+	  xmlns:android="http://schemas.android.com/apk/res/android"
+	  android:orientation="vertical"
+	  android:layout_width="fill_parent"
+	  android:layout_height="fill_parent">
+	  
+	    <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+		  
+            <TextView
+                android:id="@+id/rss_row_text_title" 
+                android:text="http://some.test.com/..."
+                android:ellipsize="end" 
+                android:scrollHorizontally="true"
+                android:maxLines="1"
+                android:layout_marginTop="10dip"
+                android:layout_weight=".3"
+                android:layout_width="wrap_content" 
+                android:layout_height="wrap_content"/>
+            
+            <TextView
+                android:id="@+id/rss_row_text_date" 
+                android:text="14 Dec"
+                android:maxLines="1"
+                android:gravity="right"
+                android:textColor="#aaaaaa"
+                android:layout_marginTop="10dip"
+                android:layout_marginRight="5dip"
+                android:layout_weight="1"
+                android:layout_width="fill_parent" 
+                android:layout_height="wrap_content"/>
+	        
+		</LinearLayout>
+		
+		<TextView
+		    android:id="@+id/rss_row_text_content" 
+		    android:text="content"  
+		    android:layout_marginBottom="10dip"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"/>
+	
+	</LinearLayout>
+</LinearLayout>

@@ -7,11 +7,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 
-public class CustomViewBinder implements ViewBinder {
+public class StockViewBinder implements ViewBinder {
     
     private final Context mContext;
     
-    public CustomViewBinder(Context context){
+    public StockViewBinder(Context context){
         mContext = context;
     }
 

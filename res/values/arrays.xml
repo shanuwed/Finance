@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- These are the keys used in CheckBoxPreference in subscriptionoptions.xml-->
+    <string-array name="subscriptionoptions_keys">
+       <item>usmarkets</item>
+       <item>mostpopular</item>
+       <item>investingstrategies</item>
+       <item>taxes</item>
+       <item>OilGasRefiningMarketing</item>
+       <item>Gold</item>
+       <item>Silver</item>
+       <item>SteelIron</item>
+       <item>Synthetics</item>
+       <item>AssetManagement</item>
+       <item>RealEstateDevelopment</item>
+       <item>CreditServices</item>
+       <item>LifeInsurance</item>
+       <item>SavingsLoans</item>
+       <item>HealthCarePlans</item>
+       <item>Hospitals</item>
+       <item>MedicalInstrumentsSupplies</item>
+       <item>ApplicationSoftware</item>
+       <item>HealthcareInformationServices</item>
+       <item>InternetSoftwareServices</item>
+       <item>WirelessCommunications</item>
+    </string-array>
+    
+    <!-- Used as tab and preference titles -->
+    <string-array name="subscriptionoptions_keys_title">
+	    <item>@string/title_usmarkets</item>
+	    <item>@string/title_mostpopular</item>
+	    <item>@string/title_investingstrategies</item>
+	    <item>@string/title_taxes</item>
+	    <item>@string/title_OilGasRefiningMarketing</item>
+	    <item>@string/title_Gold</item>
+	    <item>@string/title_Silver</item>
+	    <item>@string/title_SteelIron</item>
+	    <item>@string/title_Synthetics</item>
+	    <item>@string/title_AssetManagement</item>
+	    <item>@string/title_RealEstateDevelopment</item>
+	    <item>@string/title_CreditServices</item>
+	    <item>@string/title_LifeInsurance</item>
+	    <item>@string/title_SavingsLoans</item>
+	    <item>@string/title_HealthCarePlans</item>
+	    <item>@string/title_Hospitals</item>
+	    <item>@string/title_MedicalInstrumentsSupplies</item>
+	    <item>@string/title_ApplicationSoftware</item>
+	    <item>@string/title_HealthcareInformationServices</item>
+	    <item>@string/title_InternetSoftwareServices</item>
+	    <item>@string/title_WirelessCommunications</item>
+	</string-array>
+    
+    <string-array name="subscriptionoptions_topics">
+        <item>@string/title_newstopic</item>
+        <item>@string/title_basicmaterials</item>
+        <item>@string/title_financial</item>
+        <item>@string/title_healthcare</item>
+        <item>@string/title_technology</item>
+        </string-array>
+    
+</resources>

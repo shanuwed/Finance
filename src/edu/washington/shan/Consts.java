@@ -11,8 +11,8 @@ public class Consts {
     
     public static final String REFRESH_STOCK_VIEW = "edu.washington.shan.finance.refresh_stock";
     public static final String REFRESH_NEWS_VIEW = "edu.washington.shan.finance.refresh_news";
-    public static final String TABTAB_MARKET = "market";
-    public static final String TABTAB_STOCK = "stock";
-    public static final String TABTAB_NEWS = "news";
+    public static final String TABTAG_MARKET = "market";
+    public static final String TABTAG_STOCK = "stock";
+    public static final String TABTAG_NEWS = "news";
     public static final String NEW_TICKER_ADDED = "new_ticker_added";
 }

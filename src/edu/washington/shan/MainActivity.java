@@ -2,18 +2,26 @@ package edu.washington.shan;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import edu.washington.shan.news.Constants;
+import edu.washington.shan.news.NewsSyncManager;
+import edu.washington.shan.news.PrefKeyManager;
+
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends TabActivity  implements AsyncTaskCompleteListener<String> {
 
@@ -26,6 +34,11 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
 
     private SyncManager mStockSyncMan;
     private AtomicBoolean mStockNewDataAvailable; // lock-free thread-safe boolean
+    
+    private NewsSyncManager mNewsSyncMan;
+    private AtomicBoolean mNewsNewDataAvailable; // 
+    private PrefKeyManager mPrefKeyManager;
+    private Handler mHandler;
 
     // TODO get the symbols dynamically...
     private static final String[] symbols = 
@@ -40,14 +53,10 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.main);
     	
+    	
+    	// Stocks...
     	mStockNewDataAvailable = new AtomicBoolean(false);
-    
-    	// Create an Intent to launch an Activity for the tab (to be reused)
-    	addTab(Consts.TABTAB_MARKET, "Market", new Intent().setClass(this, MarketActivity.class));
-    	addTab(Consts.TABTAB_STOCK, "Stock", new Intent().setClass(this, StockActivity.class));
-    	addTab(Consts.TABTAB_NEWS, "News", new Intent().setClass(this, NewsActivity.class));
-	
-        // Check to see if we're restarting with a sync manager.
+            // Check to see if we're restarting with a sync manager.
         // If so, restore the sync manager instance.
         if(null != (mStockSyncMan = (SyncManager)getLastNonConfigurationInstance())){
             mStockSyncMan.setContext(this, this);
@@ -56,20 +65,45 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             mStockSyncMan.sync(symbols); // TODO DEBUG ONLY
         }
         
+        
+        // News reader...
+        mNewsNewDataAvailable = new AtomicBoolean(false);
+        // TODO need to wrap in getLastNonConfigurationInstance()...
+        mHandler = new Handler(mCallback);
+        mPrefKeyManager = PrefKeyManager.getInstance();
+        mNewsSyncMan = new NewsSyncManager(this, mHandler);
+        mPrefKeyManager.initialize(this); // be sure to initialize before using it
+        
+        
+        //addTabsBasedOnPreferences();
+        //cleanupOldFeeds();
+        //clearFirstTimeRunFlag();
+        //syncAtStartup();
+        
+        
     	// TODO Check network connectivity
     	//...
     	
+        // Create an Intent to launch an Activity for the tab (to be reused)
+        addTab(Consts.TABTAG_MARKET, "Market", 
+                new Intent().setClass(this, MarketActivity.class));
+        addTab(Consts.TABTAG_STOCK, "Stock", 
+                new Intent().setClass(this, StockActivity.class));
+        addTab(Consts.TABTAG_NEWS, "News", 
+                new Intent().setClass(this, NewsActivity.class));
+    
         // When a tab changes check to see if new RSS feeds are available for
         // the tab. Then sends a broadcast message to refresh the tab.
         getTabHost().setOnTabChangedListener(mOnTabChangeListener);
     }
     
-    private TabHost.OnTabChangeListener mOnTabChangeListener = new TabHost.OnTabChangeListener() {
+    private TabHost.OnTabChangeListener mOnTabChangeListener = 
+        new TabHost.OnTabChangeListener() {
 
         @Override
         public void onTabChanged(String tabId) {
             // tabId == tabTag
-            if (tabId.equals(Consts.TABTAB_STOCK)) {
+            if (tabId.equals(Consts.TABTAG_STOCK)) {
 
                 if (mStockNewDataAvailable.get()) {
                     Log.v(TAG, "sending a broadcast to stock tab");
@@ -79,6 +113,14 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                     Intent intent = new Intent(Consts.REFRESH_STOCK_VIEW);
                     sendBroadcast(intent);
                     mStockNewDataAvailable.set(false);
+                }
+            } else if (tabId.equals(Consts.TABTAG_NEWS)) {
+
+                if (mNewsNewDataAvailable.get()) {
+                    Log.v(TAG, "sending a broadcast to news tab");
+                    Intent intent = new Intent(Consts.REFRESH_NEWS_VIEW);
+                    sendBroadcast(intent);
+                    mNewsNewDataAvailable.set(false);
                 }
             }
         }
@@ -164,9 +206,9 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         String tabTag = getTabHost().getCurrentTabTag();
-        if(tabTag.equals(Consts.TABTAB_MARKET)){
+        if(tabTag.equals(Consts.TABTAG_MARKET)){
             // Add a tab specific menu if needed
-        }else if(tabTag.equals(Consts.TABTAB_NEWS)){
+        }else if(tabTag.equals(Consts.TABTAG_NEWS)){
             // TODO add to string resource
             menu.add(Menu.NONE, MENU_SUBSCRIPTION, 0, "Subscription"). 
                 setIcon(R.drawable.ic_menu_pref);
@@ -174,7 +216,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 setIcon(R.drawable.ic_menu_search);
             menu.add(Menu.NONE, MENU_REFRESH, 0, "Refresh").
                 setIcon(R.drawable.ic_menu_refresh);
-        }else if(tabTag.equals(Consts.TABTAB_STOCK)){
+        }else if(tabTag.equals(Consts.TABTAG_STOCK)){
             menu.add(Menu.NONE, MENU_ADDTICKER, 0, "Add Ticker").
                 setIcon(R.drawable.ic_menu_plus);
         }
@@ -193,31 +235,26 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.mainmenu_settings) {
-            
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivityForResult(intent, ACTIVITY_SETTINGS);
-            
+
         } else if (item.getItemId() == R.id.mainmenu_help) {
-            
             // Utils.showAboutDialogBox(this);
-            
+
         } else if (item.getItemId() == MENU_SUBSCRIPTION) {
-            
             Log.v(TAG, "menu id:" + MENU_SUBSCRIPTION);
-            
+
         } else if (item.getItemId() == MENU_ADDTICKER) {
-            
             Log.v(TAG, "menu id:" + MENU_ADDTICKER);
             Intent intent = new Intent(this, StockSearchActivity.class);
             startActivityForResult(intent, MENU_ADDTICKER);
-            
+
         } else if (item.getItemId() == MENU_SEARCH) {
-            
             Log.v(TAG, "menu id:" + MENU_SEARCH);
-            
+
         } else if (item.getItemId() == MENU_REFRESH) {
-            
             Log.v(TAG, "menu id:" + MENU_REFRESH);
+            syncNews();
         }
 
         // Returning true ensures that the menu event is not be further
@@ -239,5 +276,58 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             mStockSyncMan.syncForce(symbol);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    /**
+     * Callback function for the background thread to call
+     * when it's done.
+     */
+    private Handler.Callback mCallback = new Handler.Callback() 
+    {
+        @Override
+        public boolean handleMessage(Message msg) {
+            
+            Log.v(TAG, "Handler.Callback entered");
+            
+            Bundle bundle = msg.getData();
+            if(bundle != null)
+            {
+                boolean overallResult = true;
+                boolean[] results = bundle.getBooleanArray(Constants.KEY_STATUS);
+                for(boolean result : results)
+                {
+                    if(!result)
+                    {
+                        overallResult = false;
+                        break;
+                    }
+                }
+                
+                if(overallResult)
+                {
+                    Log.v(TAG, "RSS retrieval succeeded");
+                    
+                    // Send "refresh" message to a tab. Only the active tab will receive.
+                    Intent intent = new Intent(Consts.REFRESH_NEWS_VIEW);
+                    sendBroadcast(intent);
+                   
+                    mStockNewDataAvailable.compareAndSet(false, true);
+                }
+                else
+                {
+                    Log.v(TAG, "RSS retrieval failed");
+                    Toast.makeText(getApplicationContext(), 
+                            getResources().getString(R.string.rss_retrieval_failed), 
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+            return false;
+        }
+    };
+    
+    private void syncNews()
+    {
+        String[] tabTags = new String[]{"usmarkets"}; 
+        mNewsSyncMan.sync(tabTags);
     }
 }

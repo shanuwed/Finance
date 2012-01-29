@@ -12,7 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
-import edu.washington.shan.stock.CustomViewBinder;
+import edu.washington.shan.stock.StockViewBinder;
 import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
 

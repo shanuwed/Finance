@@ -1,23 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, MainActivity!</string>
     <string name="app_name">WALL ST</string>
-    <string name="menu_title_help">Help</string>
-    <string name="menu_title_settings">Settings</string>
-
-    <string name="settings_prefscreen_title">Settings</string>
-    <string name="settings_prefscreen_summary">settings..</string>
-    
-    <string name="settings_title">Settings...</string>
         
     <string name="settings_xyz_defaultvalue">xyz-default</string>
     <string name="settings_xyz_title">xyz-title</string>
     <string name="settings_xyz_summary">xyz-summary</string>
     
-    <string name="no_data">No data</string>
     <string name="error_already_in_progress">Task is already in progress</string>
     
-    <string name="no_search_result">No match found</string>
+    <!-- Following is the News reader strings -->    
+    <string name="help_dialog_title">Yafi RSS Reader</string>
+    <string name="help_dialog_msg">Powered by Yahoo! Finance</string>
+    <string name="help_dialog_okay">Ok</string>
+    <string name="rss_retrieval_failed">Cannot retrieve RSS feed. Please try again later.</string>
+    <string name="prefscreen_title">RSS Subscription Preferences</string>
+    <string name="prefscreen_summary">RSS Subscription Preferences</string>
+    <string name="settings_prefscreen_title">Setting Preferences</string>
+    <string name="settings_prefscreen_summary">Setting Preferences</string>
+    <string name="no_data">No data</string>
+    <string name="no_search_result">No matching result</string>
+    <string name="search_title">Search</string>
+    <string name="pref_filename">edu.washington.shan_preferences</string>
+    <string name="menu_title_settings">Settings</string>
+    <string name="menu_title_help">Help</string>
+    <string name="settings_title">RSS Settings</string>
+    <string name="settings_saving_policy_title">Retention Policy</string>
+    <string name="settings_saving_policy_summary">Delete RSS feeds older than 30 days</string>
+    <string name="settings_sync_title">Sync at startup</string>
+    <string name="settings_sync_summary">Automatically pull RSS feeds from server when the app starts</string>
+    <string name="settings_rss_feed_save_key">settings_rss_feed_save</string>
+    <string name="settings_auto_sync_key">settings_auto_sync</string>
+    <string name="mark_as_favorite_key">Placeholder for internal use of the resource Id</string>
         
-</resources>
+    <!-- Used as tab and preference labels -->
+    <string name="title_usmarkets">U.S Markets</string>
+    <string name="title_mostpopular">Most Popular</string>
+    <string name="title_investingstrategies">Investing Strategies</string>
+    <string name="title_mortgages">Mortgages</string>
+    <string name="title_taxes">Taxes</string>
+    <string name="title_OilGasRefiningMarketing">Oil &amp; Gas Refining</string>
+    <string name="title_Gold">Gold</string>
+    <string name="title_Silver">Silver</string>
+    <string name="title_SteelIron">Steel and Iron</string>
+    <string name="title_Synthetics">Synthetics</string>
+    <string name="title_AssetManagement">Asset Management</string>
+    <string name="title_RealEstateDevelopment">Real Estate Development</string>
+    <string name="title_CreditServices">Credit Services</string>
+    <string name="title_LifeInsurance">Life Insurance</string>
+    <string name="title_SavingsLoans">Savings and Loans</string>
+    <string name="title_HealthCarePlans">Health Care Plans</string>
+    <string name="title_Hospitals">Hospitals</string>
+    <string name="title_MedicalInstrumentsSupplies">Medical Instruments and Supplies</string>
+    <string name="title_ApplicationSoftware">Application Software</string>
+    <string name="title_HealthcareInformationServices">Healthcare Information Services</string>
+    <string name="title_InternetSoftwareServices">Internet Software Services</string>
+    <string name="title_WirelessCommunications">Wireless Communication</string>
+    
+    <!-- RSS topic category labels -->
+    <string name="title_newstopic">News Topic</string>
+    <string name="title_basicmaterials">Basic Materials</string>
+    <string name="title_financial">Financial</string>
+    <string name="title_healthcare">Healthcare</string>
+    <string name="title_technology">Technology</string></resources>
