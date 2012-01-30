@@ -43,7 +43,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     private StockSyncManager mStockSyncMan;
     private NewsSyncManager mNewsSyncMan;
     private PrefKeyManager mPrefKeyManager;
-    private Handler mHandler;
 
     // TODO get the symbols dynamically...
     private static final String[] symbols = 
@@ -68,11 +67,11 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         }
         
         
-        // TODO need to wrap in getLastNonConfigurationInstance()...
-        mHandler = new Handler(mCallback);
+        mNewsSyncMan = new NewsSyncManager(this, new Handler(mCallback));
         mPrefKeyManager = PrefKeyManager.getInstance();
-        mNewsSyncMan = new NewsSyncManager(this, mHandler);
-        mPrefKeyManager.initialize(this); // be sure to initialize before using it
+        mPrefKeyManager.initialize(
+                // be sure to initialize before using it
+                getResources().getStringArray(R.array.subscriptionoptions_keys));
         
         
         //addTabsBasedOnPreferences();
@@ -92,7 +91,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         addTab(TABTAG_NEWS, "News", 
                 new Intent().setClass(this, NewsActivity.class));
     
-        // When a tab changes check to see if new RSS feeds are available for
+        // When a tab switches check to see if new RSS feeds are available for
         // the tab. Then sends a broadcast message to refresh the tab.
         getTabHost().setOnTabChangedListener(mOnTabChangeListener);
     }
@@ -316,7 +315,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     }
     
     private void syncStocks(){
-        // TODO how does it work if there's another thread already working...??
         mStockSyncMan.syncForce(symbols); // TODO DEBUG ONLY
     }
 }

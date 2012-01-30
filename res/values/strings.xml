@@ -7,7 +7,7 @@
     <string name="settings_xyz_title">xyz-title</string>
     <string name="settings_xyz_summary">xyz-summary</string>
     
-    <string name="error_already_in_progress">Task is already in progress</string>
+    <string name="error_already_in_progress">Download is already in progress</string>
     
     <!-- Following is the News reader strings -->    
     <string name="help_dialog_title">Yafi RSS Reader</string>

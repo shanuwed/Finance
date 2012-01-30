@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.washington.shan.R;
+import edu.washington.shan.util.UIUtilities;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,16 +25,7 @@ public class NewsSyncManager {
 	private static final String TAG = "NewsSyncManager";
 	
 	/**
-	 * Use a synchronized map to allow concurrent access from 
-	 * the UI activity as well as from a worker thread. 
-	 * Keys  Tab tag
-	 * Values Whether new feeds are available for the tab identified by the key 
-	 */
-	private Map<String, Boolean> mSyncStatusMap = 
-		Collections.synchronizedMap(new HashMap<String, Boolean>());
-	
-	/**
-	 * Worker thread to retreive RSS feeds
+	 * Worker thread to retreive news
 	 */
     private Thread mWorkerThread;
     
@@ -47,13 +41,6 @@ public class NewsSyncManager {
      */
     private Handler mClientHandler;
     
-    /**
-     * Handler to a private callback function
-     * that gets invoked when worker thread returns.
-     */
-    private Handler mPrivateHandler;  
-
-	
 	/**
 	 * 
 	 * @param context Context with which to create DbAdapter (eventually at SubscriptionManager level). Must not be null. 
@@ -66,22 +53,28 @@ public class NewsSyncManager {
     	
 		mContext = context;
 		mClientHandler = handler;
-		mPrivateHandler = new Handler(mPrivateCallback);
 	}
 	
-	public void sync(String[] tabTags)
-	{
+    public void sync(String[] tabTags) {
         // Start a worker thread to sync.
         // The worker thread retreives the latest RSS feeds from server.
         // If there are new items, it adds them to the db.
         // Then the thread signals back to the caller that
         // new items are available. The caller sends out a
-        // broadcast message. Unon receiving a broadcast message
-        // a tab (RssActivity) refreshes its list view.
-        mWorkerThread = new Thread(new WorkerThreadRunnable(mContext, mPrivateHandler, tabTags));
-        mWorkerThread.start();
-	}
-	
+        // broadcast message. Unon receiving a broadcast message,
+        // a tab refreshes its list view.
+        if (null == mWorkerThread
+                || mWorkerThread.getState() == Thread.State.TERMINATED) {
+            mWorkerThread = new Thread(new WorkerThreadRunnable(mContext,
+                    mClientHandler, tabTags));
+            mWorkerThread.start();
+        } else {
+            Log.v(TAG, "download is already in progress");
+            UIUtilities.showToast(mContext,
+                    R.string.error_already_in_progress);
+        }
+    }
+/*	
 	private Handler.Callback mPrivateCallback = new Handler.Callback() 
 	{
 		@Override
@@ -92,15 +85,9 @@ public class NewsSyncManager {
 			boolean[] results  = bundle.getBooleanArray(Constants.KEY_STATUS);
 			String[] tabTags = bundle.getStringArray(Constants.KEY_TAB_TAG);
 			
-			synchronized(mSyncStatusMap)
-			{
-				mSyncStatusMap.clear();
-				for(int index=0; index< results.length; index++)
-				{
-					// Store the tag and the result
-					mSyncStatusMap.put(tabTags[index], results[index]);
-				}
-			}
+            for (int index = 0; index < results.length; index++) {
+                Log.v(TAG, "result for " + tabTags[index] + " is " + results[index]);
+            }
 			
 			if(mClientHandler != null)
 			{
@@ -112,37 +99,4 @@ public class NewsSyncManager {
 			return false;
 		}
 	};
-	
-	/**
-	 * Checks to see if new data is available
-	 * @param key Tab tag
-	 * @return True is new data is available
-	 */
-	public boolean isNewDataAvailable(String key)
-	{
-		boolean ret = false;
-		synchronized(mSyncStatusMap)
-		{
-			if(mSyncStatusMap.containsKey(key))
-			{
-				ret = mSyncStatusMap.get(key);
-			}
-		}
-		return ret;
-	}
-	
-	/**
-	 * Clears New Data Available flag
-	 * @param key Tag tag
-	 */
-	public void clearNewDataAvailableFlag(String key)
-	{
-		synchronized(mSyncStatusMap)
-		{
-			if(mSyncStatusMap.containsKey(key))
-			{
-				mSyncStatusMap.put(key, false);
-			}
-		}
-	}
-}
+*/}

@@ -43,12 +43,8 @@ public class PrefKeyManager
 	}
 	
 	// Client must call this to initialize
-	public void initialize(Context context)
+	public void initialize(String[] optionKeys)
 	{
-		Resources resources = context.getResources();
-		
-		// Get the keys from the resource to check each preference
-		String[] optionKeys = resources.getStringArray(R.array.subscriptionoptions_keys);
 		int value = 0;
 		for(String key : optionKeys)
 		{

@@ -9,6 +9,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import edu.washington.shan.AsyncTaskCompleteListener;
+import edu.washington.shan.R;
+import edu.washington.shan.util.UIUtilities;
 
 /**
  * @author shan@uw.edu
@@ -72,11 +74,9 @@ public class StockSyncManager implements AsyncTaskCompleteListener<String> {
             mDownloadTask = new DownloadStockTask(mContext, this);
             mDownloadTask.execute(symbols);
         } else {
-            // TODO need to rethink the logic here...
-            // what does it mean if mDownloadTask != null. Can we restart the same async task?
-            //UIUtilities.showToast(mContext,
-            //        R.string.error_already_in_progress);
             Log.v(TAG, "download is already in progress");
+            UIUtilities.showToast(mContext,
+                    R.string.error_already_in_progress);
         }
     }
 

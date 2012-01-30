@@ -1,6 +1,3 @@
-/**
- * 
- */
 package edu.washington.shan;
 
 import android.app.ListActivity;
@@ -24,8 +21,6 @@ import edu.washington.shan.stock.DBConstants;
 public class MarketActivity extends ListActivity {
     
     private static final String TAG = "MarketActivity";
-    private DBAdapter mDbAdapter;
-    private StockViewBinder mCustomViewBinder;
     private RefreshBroadcastReceiver refreshBroadcastReceiver;
     
     /** Called when the activity is first created. */
@@ -36,35 +31,24 @@ public class MarketActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.market);
         
-        mCustomViewBinder = new StockViewBinder(this); // use the stock view finder
-        refreshBroadcastReceiver = new RefreshBroadcastReceiver();
-        
         // Display the list from the database
-        mDbAdapter = new DBAdapter(this);
-        mDbAdapter.open();
         fillData();
         
+        refreshBroadcastReceiver = new RefreshBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).
         registerReceiver(refreshBroadcastReceiver, 
                 new IntentFilter(Consts.REFRESH_STOCK_VIEW));
     }
     
     /**
-     * Clean up the adapter
-     */
-    @Override
-    public void onDestroy() {
-        mDbAdapter.close();
-        super.onDestroy();
-    }
-
-    /**
      * Populate the list view from the data in db
      */
     private void fillData() {
+        DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
         try {
+            dbAdapter.open();
             // Get the rows from the database and create the item list
-            Cursor cursor = mDbAdapter.fetchMarketIndexes();
+            Cursor cursor = dbAdapter.fetchMarketIndexes();
             startManagingCursor(cursor);
 
             // Create an array to specify the fields we want to display in the
@@ -88,14 +72,16 @@ public class MarketActivity extends ListActivity {
 
             SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
                     R.layout.stock_row, cursor, from, to);
-            adapter.setViewBinder(mCustomViewBinder);
+            StockViewBinder stockViewBinder = new StockViewBinder(this);
+            adapter.setViewBinder(stockViewBinder);
             setListAdapter(adapter);
         } catch (java.lang.IllegalStateException e) {
             Log.e(TAG, "Exception in fillData", e);
         } catch (java.lang.RuntimeException e) {
             Log.e(TAG, "Exception in fillData", e);
+        } finally{
+            dbAdapter.close();
         }
-
     }    
     
     /**
