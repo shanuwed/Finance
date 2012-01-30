@@ -11,7 +11,7 @@
         
         <CheckBoxPreference
             android:key="usmarkets"
-            android:title="@string/title_usmarkets" android:enabled="false" android:selectable="false" android:summary="This option is always selected."/>
+            android:title="@string/title_usmarkets" />
         
         <CheckBoxPreference
             android:key="mostpopular"

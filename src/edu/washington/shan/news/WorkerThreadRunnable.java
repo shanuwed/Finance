@@ -18,25 +18,25 @@ public class WorkerThreadRunnable implements Runnable {
 	private static final String TAG = "WorkerThreadRunnable";
 	private Handler mHandler;
 	private Context mContext; 
-	private String[] mTabTags;
+	private String[] mTopics;
 	
 	/**
 	 * Worker thread constructor
 	 * @param context Context under which to create DbAdapter and manage cursor
 	 * @param handler Callback function if the caller wants to be notified when worker thread is complete. May be null.
-	 * @param tabTags Tabs for which to retrieve RSS feeds
+	 * @param topics Topics for which to retrieve RSS feeds
 	 */
-	public WorkerThreadRunnable(Context context, Handler handler, String[] tabTags)
+	public WorkerThreadRunnable(Context context, Handler handler, String[] topics)
 	{
 		// To enable the assertion do either of these:
 		// 1) adb shell setprop debug.assert 1
 		// 2) Send the command line argument "--enable-assert" to the dalvik VM
 		assert mContext != null;
-		assert tabTags != null && tabTags.length != 0;
+		assert topics != null && topics.length != 0;
 		
 		mContext = context;
 		mHandler = handler;
-		mTabTags = tabTags;
+		mTopics = topics;
 	}
 
 	/* (non-Javadoc)
@@ -45,15 +45,15 @@ public class WorkerThreadRunnable implements Runnable {
 	@Override
 	public void run() {
 		int index = 0;
-		boolean[] results = new boolean[mTabTags.length];
-		for (index = 0; index < mTabTags.length; index++)
+		boolean[] results = new boolean[mTopics.length];
+		for (index = 0; index < mTopics.length; index++)
 			results[index] = false;
 
 		SubscriptionManager subscription = new SubscriptionManager(mContext);
 		if (subscription.checkConnection()) {
-			for (index = 0; index < mTabTags.length; index++) {
-				Log.v(TAG, "requesting RSS feed for:" + mTabTags[index]);
-				results[index] = subscription.getRssFeed(mTabTags[index]);
+			for (index = 0; index < mTopics.length; index++) {
+				Log.v(TAG, "requesting RSS feed for:" + mTopics[index]);
+				results[index] = subscription.getRssFeed(mTopics[index]);
 				// Even if one of them fails continue to process all.
 			}
 		}
@@ -71,7 +71,7 @@ public class WorkerThreadRunnable implements Runnable {
 		// Return the status
 		Bundle bundle = new Bundle();
 		bundle.putBooleanArray(Constants.KEY_STATUS, results);
-		bundle.putStringArray(Constants.KEY_TAB_TAG, mTabTags);
+		bundle.putStringArray(Constants.KEY_TAB_TAG, mTopics);
 		
 		if(mHandler != null)
 		{

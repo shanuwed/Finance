@@ -34,14 +34,6 @@ public class SettingsActivity extends PreferenceActivity implements OnSharedPref
         if (key.equals("settings_zipcode")) {
             /*
             // Search for a valid pattern
-            // If it's not numbers or length != 5 force it to the default value
-            // settings_zipcode_defaultvalue
-            String pattern = "[0-9][0-9][0-9][0-9][0-9]";
-            String value = sharedPreferences.getString(key, null);
-            if (!Pattern.matches(pattern, value)) {
-                // The value is not a valid zip code.
-                // TODO change the value
-            }
             */
         }            
     }

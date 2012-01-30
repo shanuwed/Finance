@@ -55,7 +55,7 @@ public class NewsSyncManager {
 		mClientHandler = handler;
 	}
 	
-    public void sync(String[] tabTags) {
+    public void sync(String[] topics) {
         // Start a worker thread to sync.
         // The worker thread retreives the latest RSS feeds from server.
         // If there are new items, it adds them to the db.
@@ -66,7 +66,7 @@ public class NewsSyncManager {
         if (null == mWorkerThread
                 || mWorkerThread.getState() == Thread.State.TERMINATED) {
             mWorkerThread = new Thread(new WorkerThreadRunnable(mContext,
-                    mClientHandler, tabTags));
+                    mClientHandler, topics));
             mWorkerThread.start();
         } else {
             Log.v(TAG, "download is already in progress");

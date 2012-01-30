@@ -1,16 +1,12 @@
 package edu.washington.shan;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import edu.washington.shan.news.Constants;
-import edu.washington.shan.news.NewsSyncManager;
-import edu.washington.shan.news.PrefKeyManager;
-import edu.washington.shan.news.SubscriptionPrefActivity;
-import edu.washington.shan.stock.StockSyncManager;
+import java.util.ArrayList;
 
 import android.app.TabActivity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,10 +17,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.washington.shan.news.Constants;
+import edu.washington.shan.news.NewsSyncManager;
+import edu.washington.shan.news.PrefKeyManager;
+import edu.washington.shan.news.SubscriptionPrefActivity;
+import edu.washington.shan.stock.StockSyncManager;
 
 public class MainActivity extends TabActivity  implements AsyncTaskCompleteListener<String> {
 
@@ -57,13 +57,15 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.main);
     	
+    	initialize();
+    	
         // Check to see if we're restarting with a sync manager.
         // If so, restore the sync manager instance.
         if(null != (mStockSyncMan = (StockSyncManager)getLastNonConfigurationInstance())){
             mStockSyncMan.setContext(this, this);
         }else{
             mStockSyncMan = new StockSyncManager(this, this);
-            mStockSyncMan.sync(symbols); // TODO DEBUG ONLY
+            //mStockSyncMan.sync(symbols); // TODO DEBUG ONLY
         }
         
         
@@ -74,11 +76,9 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 getResources().getStringArray(R.array.subscriptionoptions_keys));
         
         
-        //addTabsBasedOnPreferences();
         //cleanupOldFeeds();
-        //clearFirstTimeRunFlag();
+        clearFirstTimeRunFlag();
         //syncAtStartup();
-        
         
     	// TODO Check network connectivity
     	//...
@@ -96,7 +96,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         getTabHost().setOnTabChangedListener(mOnTabChangeListener);
     }
     
-    // TODO REMOVE??
+    // TODO REMOVE if not needed
     private TabHost.OnTabChangeListener mOnTabChangeListener = 
         new TabHost.OnTabChangeListener() {
 
@@ -186,7 +186,10 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     public boolean onCreateOptionsMenu(Menu menu) {
         String tabTag = getTabHost().getCurrentTabTag();
         if(tabTag.equals(TABTAG_MARKET)){
-            // Add a tab specific menu if needed
+            // Add a tab specific menu
+            // Stock and Market use the same function call to refresh 
+            menu.add(Menu.NONE, MENU_STOCK_REFRESH, 0, "Refresh").
+                setIcon(R.drawable.ic_menu_refresh);
         }else if(tabTag.equals(TABTAG_NEWS)){
             // TODO add to string resource
             menu.add(Menu.NONE, MENU_NEWS_SUBSCRIPTION, 0, "Subscription"). 
@@ -199,7 +202,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             menu.add(Menu.NONE, MENU_STOCK_ADDTICKER, 0, "Add Ticker").
                 setIcon(R.drawable.ic_menu_plus);
             menu.add(Menu.NONE, MENU_STOCK_REFRESH, 0, "Refresh").
-            setIcon(R.drawable.ic_menu_refresh);
+                setIcon(R.drawable.ic_menu_refresh);
         }
         
         MenuInflater inflater = getMenuInflater();
@@ -261,7 +264,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         
         if(requestCode == MENU_STOCK_ADDTICKER && resultCode == RESULT_OK){
             String symbol = data.getExtras().getString(Consts.NEW_TICKER_ADDED);
-            // TODO get the symbol user wants to add
             mStockSyncMan.syncForce(new String[]{symbol});
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -310,11 +312,79 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     };
     
     private void syncNews() {
-        String[] tabTags = new String[]{"usmarkets"}; 
-        mNewsSyncMan.sync(tabTags);
+        String[] prefs = getResources().getStringArray(R.array.subscriptionoptions_keys);
+        ArrayList<String> topics = new ArrayList<String>();
+        SharedPreferences sharedPref = getSharedPreferences(
+                getResources().getString(R.string.pref_filename), 
+                MODE_PRIVATE);
+        for(String pref : prefs) {
+            if(sharedPref.getBoolean(pref, false))
+                topics.add(pref);
+        }
+        // pass in the topics of RSS feeds to retrieve
+        mNewsSyncMan.sync(topics.toArray(new String[]{})); 
     }
     
     private void syncStocks(){
         mStockSyncMan.syncForce(symbols); // TODO DEBUG ONLY
     }
+    
+    /**
+     * Run first time initialization after the install
+     */
+    private void initialize() {
+        if(isFirstTimeRunFlagSet()) {
+            
+            // Forces to create a preference: <boolean name="usmarkets" value="true" />
+            String[] prefList = getResources().getStringArray(R.array.subscriptionoptions_keys);
+            setPreference(prefList[0], true); // show 'US market' tab
+            setPreference(prefList[1], true); // show 'Most Popular' tab
+        }
+    }
+    
+    /**
+     * Returns true if this is first time app is launched
+     * @return
+     */
+    private boolean isFirstTimeRunFlagSet(){
+        // Determine if this is the first time running the app
+        // Shared preference for 'initialized' is stored in 
+        // MainActivity.xml preference file which is different 
+        // from the subscription preferences file.
+        SharedPreferences sharedPref = getSharedPreferences(
+                getResources().getString(R.string.pref_filename), 
+                MODE_PRIVATE);
+        if(!sharedPref.getBoolean("initialized", false))
+            return true;
+        return false;
+    }
+    
+    /**
+     * Clears 'first time run' flag
+     */
+    private void clearFirstTimeRunFlag(){
+        SharedPreferences sharedPref = getSharedPreferences(
+                getResources().getString(R.string.pref_filename), 
+                MODE_PRIVATE);
+        // Now set the "initialized" flag
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("initialized", true);
+        editor.commit();
+    }
+    
+    /**
+     * Given a preference key and a value it sets the shared preference
+     * @param prefKey
+     * @param value
+     */
+    private void setPreference(String prefKey, boolean value) {
+        SharedPreferences sharedPref = getSharedPreferences(
+                getResources().getString(R.string.pref_filename), 
+                MODE_PRIVATE);
+        
+        Editor editor = sharedPref.edit();
+        editor.putBoolean(prefKey, value);
+        editor.commit();
+    }
+    
 }
