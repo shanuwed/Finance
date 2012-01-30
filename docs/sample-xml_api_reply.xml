@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<xml_api_reply version="1">
+	<finance module_id="0" tab_id="0" mobile_row="0" mobile_zipped="1"
+		row="0" section="0">
+		<symbol data="AAPL" />
+		<pretty_symbol data="AAPL" />
+		<symbol_lookup_url data="/finance?client=ig&amp;q=AAPL" />
+		<company data="Apple Inc." />
+		<exchange data="Nasdaq" />
+		<exchange_timezone data="ET" />
+		<exchange_utc_offset data="+05:00" />
+		<exchange_closing data="960" />
+		<divisor data="2" />
+		<currency data="USD" />
+		<last data="420.30" />
+		<high data="427.50" />
+		<low data="419.75" />
+		<volume data="14784607" />
+		<avg_volume data="10185" />
+		<market_cap data="391780.66" />
+		<open data="427.49" />
+		<y_close data="427.75" />
+		<change data="-7.45" />
+		<perc_change data="-1.74" />
+		<delay data="0" />
+		<trade_timestamp data="Jan 20, 2012" />
+		<trade_date_utc data="20120120" />
+		<trade_time_utc data="210007" />
+		<current_date_utc data="20120122" />
+		<current_time_utc data="001121" />
+		<symbol_url data="/finance?client=ig&amp;q=AAPL" />
+		<chart_url data="/finance/chart?q=NASDAQ:AAPL&amp;tlf=12" />
+		<disclaimer_url data="/help/stock_disclaimer.html" />
+		<ecn_url data="" />
+		<isld_last data="" />
+		<isld_trade_date_utc data="" />
+		<isld_trade_time_utc data="" />
+		<brut_last data="" />
+		<brut_trade_date_utc data="" />
+		<brut_trade_time_utc data="" />
+		<daylight_savings data="false" />
+	</finance>
+</xml_api_reply>

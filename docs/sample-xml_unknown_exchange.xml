@@ -1,0 +1,41 @@
+<xml_api_reply version="1">
+<finance module_id="0" tab_id="0" mobile_row="0" mobile_zipped="1" row="0" section="0">
+<symbol data="COMPX"/>
+<pretty_symbol data="NASDAQ"/>
+<symbol_lookup_url data="/finance?client=ig&q=COMPX"/>
+<company data=""/>
+<exchange data="UNKNOWN EXCHANGE"/>
+<exchange_timezone data=""/>
+<exchange_utc_offset data=""/>
+<exchange_closing data=""/>
+<divisor data=""/>
+<currency data=""/>
+<last data=""/>
+<high data=""/>
+<low data=""/>
+<volume data=""/>
+<avg_volume data=""/>
+<market_cap data=""/>
+<open data=""/>
+<y_close data=""/>
+<change data=""/>
+<perc_change data=""/>
+<delay data=""/>
+<trade_timestamp data="Dec 31, 1969"/>
+<trade_date_utc data=""/>
+<trade_time_utc data=""/>
+<current_date_utc data="20120129"/>
+<current_time_utc data="214928"/>
+<symbol_url data="/finance?client=ig&q=COMPX"/>
+<chart_url data="/images/no_chart.gif"/>
+<disclaimer_url data="/help/stock_disclaimer.html"/>
+<ecn_url data=""/>
+<isld_last data=""/>
+<isld_trade_date_utc data=""/>
+<isld_trade_time_utc data=""/>
+<brut_last data=""/>
+<brut_trade_date_utc data=""/>
+<brut_trade_time_utc data=""/>
+<daylight_savings data="false"/>
+</finance>
+</xml_api_reply>

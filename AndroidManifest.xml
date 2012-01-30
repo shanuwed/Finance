@@ -25,6 +25,8 @@
         <activity android:name=".StockActivity"></activity>
         <activity android:name=".SettingsActivity"></activity>
         <activity android:name=".StockSearchActivity"></activity>
-    </application>
+        <activity android:name=".NewsSearchActivity"></activity>
+        <activity android:name=".news.SubscriptionPrefActivity"></activity>
+        </application>
 
 </manifest>

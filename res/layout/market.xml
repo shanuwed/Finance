@@ -4,10 +4,35 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="market.xml" />
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:id="@+android:id/news_title"
+        android:text="Market Summary"/>
 
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dip"
+        android:src="@drawable/chart" />
+    
+    <FrameLayout
+        android:id="@+id/frameLayout1"
+        android:layout_weight="1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" >
+    
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:drawSelectorOnTop="true" />
+    
+        <TextView
+            android:id="@android:id/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_data" />
+
+    </FrameLayout>
 </LinearLayout>

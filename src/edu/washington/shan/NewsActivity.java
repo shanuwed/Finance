@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,22 +39,20 @@ public class NewsActivity extends ListActivity {
         mDbAdapter.open();
         fillData();
         
-        registerReceiver(refreshBroadcastReceiver, 
+        LocalBroadcastManager.getInstance(this).
+            registerReceiver(refreshBroadcastReceiver, 
                 new IntentFilter(Consts.REFRESH_NEWS_VIEW));
     }
     
     @Override
     public void onPause()
     {
-        unregisterReceiver(refreshBroadcastReceiver);
         super.onPause();
     }
     
     @Override
     public void onResume()
     {
-        registerReceiver(refreshBroadcastReceiver, 
-                new IntentFilter(Consts.REFRESH_NEWS_VIEW));
         super.onResume();
     }
     
@@ -128,6 +127,9 @@ public class NewsActivity extends ListActivity {
         }
         catch(java.lang.IllegalStateException e)
         {
+            // This happens when you start the thread to get the rss feed,
+            // then you rotate the screen, which will destroy and recreate
+            // the activity.
             Log.e(TAG, "Exception in fillData", e);
         }
         catch(java.lang.RuntimeException e)

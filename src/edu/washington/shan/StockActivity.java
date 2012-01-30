@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.SimpleCursorAdapter;
 import edu.washington.shan.stock.StockViewBinder;
@@ -43,29 +44,11 @@ public class StockActivity extends ListActivity {
         mDbAdapter.open();
         fillData();
         
+        LocalBroadcastManager.getInstance(this).
         registerReceiver(refreshBroadcastReceiver, 
                 new IntentFilter(Consts.REFRESH_STOCK_VIEW));
     }
     
-    /**
-     * Unregister the broadcast receiver
-     */
-    @Override
-    protected void onPause() {
-        unregisterReceiver(refreshBroadcastReceiver);
-        super.onPause();
-    }
-
-    /**
-     * Re-register the broadcast receiver
-     */
-    @Override
-    protected void onResume() {
-        registerReceiver(refreshBroadcastReceiver, 
-                new IntentFilter(Consts.REFRESH_STOCK_VIEW));
-        super.onResume();
-    }
-
     /**
      * Clean up the adapter
      */

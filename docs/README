@@ -1,0 +1,70 @@
+Google Stock API
+http://www.jarloo.com/google-stock-api/
+
+Restful query string
+http://www.google.com/ig/api?stock=AAPL
+
+You can get multiple records at a time like so:
+http://www.google.com/ig/api?stock=AAPL&stock=GOOG
+
+Google NASDAQ Index
+http://www.google.com/ig/api?stock=.IXIC
+
+Google Dow Jones Index
+http://www.google.com/ig/api?stock=.DJI
+
+Google Market chart for .DJI, .INX and .IXIC:
+<a href="/finance?q=INDEXDJX:.DJI,INDEXSP:.INX,INDEXNASDAQ:.IXIC" >
+<img src="/finance/chart?cht=c&amp;q=INDEXDJX:.DJI,INDEXSP:.INX,INDEXNASDAQ:.IXIC&amp;tlf=12h" height=130 width=250 id=mkt-chart class=id-mkt-chart 
+ alt="Market Chart"></a>
+
+
+Database schema:
+symbol
+pretty_symbol
+symbol_lookup_url
+company
+exchange
+exchange_timezone
+exchange_utc_offset
+exchange_closing
+divisor
+currency
+last
+high
+low
+volume
+avg_volume
+market_cap
+open
+y_close
+change
+perc_change
+delay
+trade_timestamp
+trade_date_utc
+trade_time_utc
+current_date_utc
+current_time_utc
+symbol_url
+chart_url
+disclaimer_url
+ecn_url
+isld_last
+isld_trade_date_utc
+isld_trade_time_utc
+brut_last
+brut_trade_date_utc
+brut_trade_time_utc
+daylight_savings
+
+
+News (RSS feeds)
+http://www.google.com/finance/company_news?q=INDEXNASDAQ:.IXIC&output=rss
+http://www.google.com/finance/company_news?q=NASDAQ:AAPL&output=rss
+
+Dow Jones
+www.google.com/finance?q=INDEXDJX:.DJI
+Nasdaq
+www.google.com/finance?q=INDEXSNASDAQ:.IXIC
+

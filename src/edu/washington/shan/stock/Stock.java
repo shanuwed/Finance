@@ -224,7 +224,7 @@ public class Stock {
                         Log.e(TAG, "failed to add to db " + symbol);
                     }
                 }else{
-                    Log.v(TAG, "item already exists in db " + symbol);
+                    Log.v(TAG, "updating item in db " + symbol);
                     dbAdapter.updateItem(stock);
                 }
             }

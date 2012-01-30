@@ -3,12 +3,36 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
+    
     <TextView xmlns:android="http://schemas.android.com/apk/res/android"
         style="?android:attr/listSeparatorTextViewStyle"
         android:id="@+android:id/news_title"
-        android:text="Market News"/>
-
+        android:text="Finance news search"/>
+    
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal">
+	    
+	    <EditText
+	        android:id="@+id/search_edittext"
+	        android:singleLine="true"
+	        android:layout_gravity="center"
+            android:layout_weight="1"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content" >
+	
+	        <requestFocus />
+	    </EditText>
+	
+        <ImageButton 
+            android:src="@drawable/search_click"
+            android:onClick="onSearch"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"/>
+        	    
+    </LinearLayout>
+            
     <!-- The frame layout is here since we will be showing either
     the empty view or the list view.  -->
     <FrameLayout
@@ -27,8 +51,8 @@
         <TextView android:id="@android:id/empty"
             android:layout_width="fill_parent" 
             android:layout_height="wrap_content"
-            android:text="@string/no_data"/>
-            
+            android:text="@string/no_search_result"/>
+
     </FrameLayout>
 
 </LinearLayout>

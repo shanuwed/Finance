@@ -144,6 +144,66 @@ public class DBAdapter {
     }
     
     /**
+     * Returns a cursor for .DJI, .IXIC and .INX
+     * @return
+     */
+    public Cursor fetchMarketIndexes() {
+        
+        Cursor cursor =
+            mDb.query(true, DBConstants.TABLE_NAME, new String[] {
+                    DBConstants.KEY_ID,
+                    DBConstants.symbol_NAME,
+                    DBConstants.pretty_symbol_NAME,
+                    DBConstants.symbol_lookup_url_NAME,
+                    DBConstants.company_NAME,
+                    DBConstants.exchange_NAME,
+                    DBConstants.exchange_timezone_NAME,
+                    DBConstants.exchange_utc_offset_NAME,
+                    DBConstants.exchange_closing_NAME,
+                    DBConstants.divisor_NAME,
+                    DBConstants.currency_NAME,
+                    DBConstants.last_NAME,
+                    DBConstants.high_NAME,
+                    DBConstants.low_NAME,
+                    DBConstants.volume_NAME,
+                    DBConstants.avg_volume_NAME,
+                    DBConstants.market_cap_NAME,
+                    DBConstants.open_NAME,
+                    DBConstants.y_close_NAME,
+                    DBConstants.change_NAME,
+                    DBConstants.perc_change_NAME,
+                    DBConstants.delay_NAME,
+                    DBConstants.trade_timestamp_NAME,
+                    DBConstants.trade_date_utc_NAME,
+                    DBConstants.trade_time_utc_NAME,
+                    DBConstants.current_date_utc_NAME,
+                    DBConstants.current_time_utc_NAME,
+                    DBConstants.symbol_url_NAME,
+                    DBConstants.chart_url_NAME,
+                    DBConstants.disclaimer_url_NAME,
+                    DBConstants.ecn_url_NAME,
+                    DBConstants.isld_last_NAME,
+                    DBConstants.isld_trade_date_utc_NAME,
+                    DBConstants.isld_trade_time_utc_NAME,
+                    DBConstants.brut_last_NAME,
+                    DBConstants.brut_trade_date_utc_NAME,
+                    DBConstants.brut_trade_time_utc_NAME,
+                    DBConstants.daylight_savings_NAME
+                    }, 
+                    DBConstants.symbol_NAME + "='.DJI' OR " +
+                    DBConstants.symbol_NAME + "='.INX' OR " +
+                    DBConstants.symbol_NAME + "='.IXIC'", 
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;    }
+    
+    /**
      * Return a Cursor over the list of all items in the database
      * 
      * @return Cursor over all items
@@ -189,12 +249,15 @@ public class DBAdapter {
     		DBConstants.brut_trade_date_utc_NAME,
     		DBConstants.brut_trade_time_utc_NAME,
     		DBConstants.daylight_savings_NAME
-    		}, 
-    		null, 
-    		null,
-    		null,
-    		null,
-    		null);
+            }, 
+            DBConstants.symbol_NAME + "!='.DJI' AND " +
+            DBConstants.symbol_NAME + "!='.INX' AND " +
+            DBConstants.symbol_NAME + "!='.IXIC'", 
+            null,
+            null,
+            null,
+            null,
+            null);
         if (cursor != null) {
             cursor.moveToFirst();
         }
@@ -220,7 +283,7 @@ public class DBAdapter {
     }
     
     /**
-     * Return a Cursor positioned at the item that matches the given title
+     * Return a Cursor positioned at the item that matches the given symbol
      * 
      * @param symbol
      * @return
