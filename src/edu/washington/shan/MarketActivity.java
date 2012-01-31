@@ -6,9 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import edu.washington.shan.stock.StockViewBinder;
 import edu.washington.shan.stock.DBAdapter;
@@ -22,7 +25,8 @@ public class MarketActivity extends ListActivity {
     
     private static final String TAG = "MarketActivity";
     private RefreshBroadcastReceiver refreshBroadcastReceiver;
-    
+    private DBAdapter mDbAdapter;
+
     /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +35,13 @@ public class MarketActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.market);
         
-        // Display the list from the database
+        if(null != (mDbAdapter = (DBAdapter) getLastNonConfigurationInstance ())){
+            mDbAdapter.open();
+        }else{
+            // Always use the application context instead of 'this' context.
+            mDbAdapter = new DBAdapter(getApplicationContext());
+            mDbAdapter.open();
+        }
         fillData();
         
         refreshBroadcastReceiver = new RefreshBroadcastReceiver();
@@ -40,15 +50,36 @@ public class MarketActivity extends ListActivity {
                 new IntentFilter(Consts.REFRESH_STOCK_VIEW));
     }
     
+    /* (non-Javadoc)
+     * @see android.app.Activity#onDestroy()
+     */
+    @Override
+    protected void onDestroy() {
+        mDbAdapter.close();
+        super.onDestroy();
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onRetainNonConfigurationInstance()
+     */
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        return mDbAdapter;
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+    }
+
     /**
      * Populate the list view from the data in db
      */
     private void fillData() {
-        DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
         try {
-            dbAdapter.open();
             // Get the rows from the database and create the item list
-            Cursor cursor = dbAdapter.fetchMarketIndexes();
+            Cursor cursor = mDbAdapter.fetchMarketIndexes();
             startManagingCursor(cursor);
 
             // Create an array to specify the fields we want to display in the
@@ -79,8 +110,6 @@ public class MarketActivity extends ListActivity {
             Log.e(TAG, "Exception in fillData", e);
         } catch (java.lang.RuntimeException e) {
             Log.e(TAG, "Exception in fillData", e);
-        } finally{
-            dbAdapter.close();
         }
     }    
     

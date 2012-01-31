@@ -6,9 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import edu.washington.shan.stock.StockViewBinder;
 import edu.washington.shan.stock.DBAdapter;
@@ -22,7 +25,9 @@ public class StockActivity extends ListActivity {
     
     private static final String TAG = "StockActivity";
     private RefreshBroadcastReceiver refreshBroadcastReceiver;
-    
+    private DBAdapter mDbAdapter;
+    private final int VIEW_STOCK_DETAIL = 1;
+
     /** Called when the activity is first created. */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +36,13 @@ public class StockActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stock);
         
-        // Display the list from the database
+        if(null != (mDbAdapter = (DBAdapter) getLastNonConfigurationInstance ())){
+            mDbAdapter.open();
+        }else{
+            // Always use the application context instead of 'this' context.
+            mDbAdapter = new DBAdapter(getApplicationContext());
+            mDbAdapter.open();
+        }
         fillData();
         
         refreshBroadcastReceiver = new RefreshBroadcastReceiver();
@@ -40,15 +51,51 @@ public class StockActivity extends ListActivity {
                 new IntentFilter(Consts.REFRESH_STOCK_VIEW));
     }
     
+    /* (non-Javadoc)
+     * @see android.app.Activity#onDestroy()
+     */
+    @Override
+    protected void onDestroy() {
+        mDbAdapter.close();
+        super.onDestroy();
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Activity#onRetainNonConfigurationInstance()
+     */
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        return mDbAdapter;
+    }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        // Using the id get the URL from the db
+        Cursor cursor = mDbAdapter.fetchItemsByRowId(id);
+        startManagingCursor(cursor);
+        if (cursor != null) {
+            int colIndex = cursor.getColumnIndex(DBConstants.symbol_NAME);
+            String symbol = cursor.getString(colIndex);
+            if (symbol != null && symbol.length() > 0) {
+                // Intent to open Stock detail activity
+                Intent i = new Intent(this, StockDetailActivity.class);
+                i.putExtra(Consts.STOCK_SYMBOL, symbol);
+                startActivityForResult(i, VIEW_STOCK_DETAIL);
+            }else{
+                Log.e(TAG, "symbol retreived from the database is invalid");
+            }
+        }
+    }
+
     /**
      * Populate the list view from the data in db
      */
     private void fillData() {
-        DBAdapter dbAdapter = new DBAdapter(getApplicationContext());
         try {
-            dbAdapter.open();
             // Get the rows from the database and create the item list
-            Cursor cursor = dbAdapter.fetchAllItems();
+            Cursor cursor = mDbAdapter.fetchAllItems();
             startManagingCursor(cursor);
 
             // Create an array to specify the fields we want to display in the
@@ -79,8 +126,6 @@ public class StockActivity extends ListActivity {
             Log.e(TAG, "Exception in fillData", e);
         } catch (java.lang.RuntimeException e) {
             Log.e(TAG, "Exception in fillData", e);
-        } finally{
-            dbAdapter.close();
         }
     }    
     

@@ -48,9 +48,9 @@ public class NewsActivity extends ListActivity {
         }
         fillData();
 
-        refreshBroadcastReceiver  = new RefreshBroadcastReceiver();
+        refreshBroadcastReceiver = new RefreshBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(
-                refreshBroadcastReceiver,
+        refreshBroadcastReceiver,
                 new IntentFilter(Consts.REFRESH_NEWS_VIEW));
     }
 
@@ -75,19 +75,8 @@ public class NewsActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        launchSelectedItemInBrowser(id);
-    }
-
-    /**
-     * Given a rowId (_id in the rssentries table in the database) it gets the
-     * record, figures out the URL and starts an Intent to open the URL in the
-     * browser.
-     * 
-     * @param rowId
-     */
-    private void launchSelectedItemInBrowser(long rowId) {
         // Using the id get the URL from the db
-        Cursor cursor = mDbAdapter.fetchItemsByRowId(rowId);
+        Cursor cursor = mDbAdapter.fetchItemsByRowId(id);
         startManagingCursor(cursor);
         if (cursor != null) {
             int colIndex = cursor.getColumnIndex(DBConstants.URL_NAME);

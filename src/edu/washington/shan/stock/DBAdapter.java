@@ -404,5 +404,31 @@ public class DBAdapter {
                 DBConstants.symbol_NAME + "==?", 
                 new String[]{stock.symbol}); // where args
     }
+
+    /**
+     * Return a Cursor positioned at the item that matches the given rowId
+     * 
+     * @param rowId id of Item to retrieve
+     * @return Cursor positioned to matching item, if found
+     * @throws SQLException if item could not be found/retrieved
+     */
+    public Cursor fetchItemsByRowId(long rowId) throws SQLException {
+
+        Cursor cursor =
+
+            mDb.query(true, DBConstants.TABLE_NAME, new String[] {
+                    DBConstants.KEY_ID,
+                    DBConstants.symbol_NAME},
+                    DBConstants.KEY_ID + "=" + rowId, 
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
     
 }
