@@ -156,27 +156,9 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
      */
     private void addTab(String tag, String caption, Intent intent) {
         TabHost.TabSpec spec = getTabHost().newTabSpec(tag).setIndicator(
-                createTabIndicator(this, caption)).setContent(intent);
+                caption,getResources().getDrawable(R.drawable.ic_menu_settings))
+                .setContent(intent);
         getTabHost().addTab(spec);
-    }
-
-    /**
-     * To customize see http://joshclemm.com/blog/?p=136 and
-     * http://androidworkz.
-     * com/2011/02/04/custom-menu-bar-tabs-how-to-hook-the-menu
-     * -button-to-showhide-a-custom-tab-bar/
-     * 
-     * @param context
-     * @param caption
-     * @return
-     */
-    private static View createTabIndicator(final Context context,
-            final String caption) {
-        View view = LayoutInflater.from(context).inflate(
-                R.layout.tab_indicator, null);
-        TextView v = (TextView) view.findViewById(R.id.tab_indicator_text);
-        v.setText(caption);
-        return view;
     }
 
     /**

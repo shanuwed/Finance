@@ -23,7 +23,7 @@
         <activity android:name=".MarketActivity"></activity>
         <activity android:name=".NewsActivity"></activity>
         <activity android:name=".StockActivity"></activity>
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".SettingsActivity" android:theme="@android:style/Theme"></activity>
         <activity android:name=".StockSearchActivity"></activity>
         <activity android:name=".NewsSearchActivity"></activity>
         <activity android:name=".news.SubscriptionPrefActivity"></activity>
