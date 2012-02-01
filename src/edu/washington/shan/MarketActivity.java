@@ -18,7 +18,7 @@ import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
 
 /**
- * @author shan@uw.edu
+ * Activity for the Market tab
  *
  */
 public class MarketActivity extends ListActivity {
@@ -71,6 +71,21 @@ public class MarketActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
+        // Using the id get the symbol from the db
+        Cursor cursor = mDbAdapter.fetchItemsByRowId(id);
+        startManagingCursor(cursor);
+        if (cursor != null) {
+            int colIndex = cursor.getColumnIndex(DBConstants.symbol_NAME);
+            String symbol = cursor.getString(colIndex);
+            if (symbol != null && symbol.length() > 0) {
+                // Intent to open Stock detail activity
+                Intent i = new Intent(this, StockDetailActivity.class);
+                i.putExtra(Consts.STOCK_SYMBOL, symbol);
+                startActivity(i);
+            }else{
+                Log.e(TAG, "symbol retreived from the database is invalid");
+            }
+        }
     }
 
     /**

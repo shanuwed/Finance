@@ -144,6 +144,22 @@ public class DBAdapter {
     }
     
     /**
+     * Delete items by symbol names
+     * @param array
+     */
+    public void removeItemsBySymbols(String[] symbols) {
+
+        for(String symbol : symbols){
+            if(mDb.delete(DBConstants.TABLE_NAME, 
+                    DBConstants.symbol_NAME + "='" + symbol + "'", 
+                    null) > 0)
+                Log.v(TAG, "Successfully deleted " + symbol);
+            else
+                Log.v(TAG, "Could not delete " + symbol);
+        }
+    }
+    
+    /**
      * Returns a cursor for .DJI, .IXIC and .INX
      * @return
      */
@@ -430,5 +446,4 @@ public class DBAdapter {
         }
         return cursor;
     }
-    
 }

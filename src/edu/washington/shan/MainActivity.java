@@ -35,6 +35,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     private static final int MENU_NEWS_SEARCH = 3;
     private static final int MENU_NEWS_REFRESH = 4;
     private static final int MENU_STOCK_REFRESH = 5;
+    private static final int MENU_STOCK_EDITTICKER = 6;
 
     public static final String TABTAG_MARKET = "market";
     public static final String TABTAG_STOCK = "stock";
@@ -199,6 +200,8 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             menu.add(Menu.NONE, MENU_NEWS_REFRESH, 0, "Refresh").
                 setIcon(R.drawable.ic_menu_refresh);
         }else if(tabTag.equals(TABTAG_STOCK)){
+            menu.add(Menu.NONE, MENU_STOCK_EDITTICKER, 0, "Edit").
+                setIcon(R.drawable.ic_menu_pencil);
             menu.add(Menu.NONE, MENU_STOCK_ADDTICKER, 0, "Add Ticker").
                 setIcon(R.drawable.ic_menu_plus);
             menu.add(Menu.NONE, MENU_STOCK_REFRESH, 0, "Refresh").
@@ -229,6 +232,11 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             Log.v(TAG, "menu id:" + MENU_NEWS_SUBSCRIPTION);
             Intent intent = new Intent(this, SubscriptionPrefActivity.class);
             startActivityForResult(intent, MENU_NEWS_SUBSCRIPTION);
+            
+        } else if(item.getItemId() == MENU_STOCK_EDITTICKER) {
+            Log.v(TAG, "menu id:" + MENU_STOCK_EDITTICKER);
+            Intent intent = new Intent(this, StockEditActivity.class);
+            startActivityForResult(intent, MENU_STOCK_EDITTICKER);
 
         } else if (item.getItemId() == MENU_STOCK_ADDTICKER) {
             Log.v(TAG, "menu id:" + MENU_STOCK_ADDTICKER);

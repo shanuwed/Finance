@@ -26,7 +26,6 @@ public class StockActivity extends ListActivity {
     private static final String TAG = "StockActivity";
     private RefreshBroadcastReceiver refreshBroadcastReceiver;
     private DBAdapter mDbAdapter;
-    private final int VIEW_STOCK_DETAIL = 1;
 
     /** Called when the activity is first created. */
     @Override
@@ -39,7 +38,7 @@ public class StockActivity extends ListActivity {
         if(null != (mDbAdapter = (DBAdapter) getLastNonConfigurationInstance ())){
             mDbAdapter.open();
         }else{
-            // Always use the application context instead of 'this' context.
+            // Always use the application context instead of activity context.
             mDbAdapter = new DBAdapter(getApplicationContext());
             mDbAdapter.open();
         }
@@ -72,7 +71,7 @@ public class StockActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
-        // Using the id get the URL from the db
+        // Using the id get the symbol from the db
         Cursor cursor = mDbAdapter.fetchItemsByRowId(id);
         startManagingCursor(cursor);
         if (cursor != null) {
@@ -82,7 +81,7 @@ public class StockActivity extends ListActivity {
                 // Intent to open Stock detail activity
                 Intent i = new Intent(this, StockDetailActivity.class);
                 i.putExtra(Consts.STOCK_SYMBOL, symbol);
-                startActivityForResult(i, VIEW_STOCK_DETAIL);
+                startActivity(i);
             }else{
                 Log.e(TAG, "symbol retreived from the database is invalid");
             }

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <CheckBox
+        android:id="@+id/stock_edit_row_checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/stock_edit_row_text1"
+        android:layout_width="70dip"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingLeft="12dip"
+        android:paddingTop="2dip"
+        android:textStyle="bold" 
+        android:text="text1" />
+
+    <TextView
+        android:id="@+id/stock_edit_row_text2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingLeft="30dip"
+        android:paddingTop="2dip"
+        android:text="text2" />
+
+</LinearLayout>

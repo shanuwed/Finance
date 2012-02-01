@@ -12,7 +12,7 @@
 
         <TextView
             android:id="@+id/stock_row_text1"
-            android:layout_width="wrap_content"
+            android:layout_width="70dip"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:maxLines="1"
@@ -27,7 +27,7 @@
             android:layout_gravity="center"
             android:gravity="center_vertical"
             android:maxLines="1"
-            android:paddingLeft="30dip"
+            android:paddingLeft="10dip"
             android:paddingTop="2dip"
             android:text="text2"
             android:textStyle="bold" />
