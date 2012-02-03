@@ -3,14 +3,13 @@
  */
 package edu.washington.shan;
 
-import java.util.regex.Pattern;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 
 /**
+ * News subscription settings such as "U.S Market", "Most popular", etc.
  * @author shan@uw.edu
  *
  */

@@ -12,11 +12,10 @@
         android:text="Market Summary"/>
 
     <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dip"
-        android:src="@drawable/chart" />
+        android:id="@+id/market_imageView1"
+        android:layout_height="130px"
+        android:layout_width="250px"
+        android:layout_margin="10dip"/>
     
     <FrameLayout
         android:id="@+id/frameLayout1"

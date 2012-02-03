@@ -16,6 +16,7 @@ import edu.washington.shan.news.DBConstants;
 import edu.washington.shan.news.NewsViewBinder;
 
 /**
+ * Provides search functionality for the RSS news from the db
  * @author shan@uw.edu
  */
 public class NewsSearchActivity extends ListActivity {

@@ -6,20 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import edu.washington.shan.stock.StockViewBinder;
 import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
+import edu.washington.shan.stock.StockViewBinder;
 
 /**
  * Handles the Stock tab
- * 
+ * @author shan@uw.edu
  */
 public class StockActivity extends ListActivity {
     

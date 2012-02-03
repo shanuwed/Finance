@@ -13,6 +13,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 /**
+ * Displays the stock detail in a web view
  * @author shan@uw.edu
  * 
  */

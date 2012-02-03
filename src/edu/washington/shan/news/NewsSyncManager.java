@@ -3,18 +3,11 @@
  */
 package edu.washington.shan.news;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
+import android.content.Context;
+import android.os.Handler;
+import android.util.Log;
 import edu.washington.shan.R;
 import edu.washington.shan.util.UIUtilities;
-
-import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.util.Log;
 
 /**
  * @author shan@uw.edu

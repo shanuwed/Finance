@@ -7,18 +7,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TabHost;
-import android.widget.TextView;
 import android.widget.Toast;
 import edu.washington.shan.news.Constants;
 import edu.washington.shan.news.NewsSyncManager;
@@ -26,6 +25,11 @@ import edu.washington.shan.news.PrefKeyManager;
 import edu.washington.shan.news.SubscriptionPrefActivity;
 import edu.washington.shan.stock.StockSyncManager;
 
+/**
+ * Main activity hosts the tab view
+ * @author shan@uw.edu
+ *
+ */
 public class MainActivity extends TabActivity  implements AsyncTaskCompleteListener<String> {
 
     private static final String TAG = "MainActivity";
@@ -45,7 +49,8 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     private NewsSyncManager mNewsSyncMan;
     private PrefKeyManager mPrefKeyManager;
 
-    // TODO get the symbols dynamically...
+    // Use these stock symbols during the first run 
+    // after the install to get some data displayed
     private static final String[] symbols = 
         new String[]{"IBM","MSFT","YHOO","GOOG","AMZN",".DJI",".INX",".IXIC"};
     
@@ -60,20 +65,18 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     	
     	initialize();
     	
-        // Check to see if we're restarting with a sync manager.
+        // Check to see if we're restarting with an instance of stock sync manager.
         // If so, restore the sync manager instance.
         if(null != (mStockSyncMan = (StockSyncManager)getLastNonConfigurationInstance())){
             mStockSyncMan.setContext(this, this);
         }else{
             mStockSyncMan = new StockSyncManager(this, this);
-            //mStockSyncMan.sync(symbols); // TODO DEBUG ONLY
         }
-        
         
         mNewsSyncMan = new NewsSyncManager(this, new Handler(mCallback));
         mPrefKeyManager = PrefKeyManager.getInstance();
         mPrefKeyManager.initialize(
-                // be sure to initialize before using it
+                // be sure to initialize PrefKeyManager before using it
                 getResources().getStringArray(R.array.subscriptionoptions_keys));
         
         
@@ -81,19 +84,18 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         clearFirstTimeRunFlag();
         //syncAtStartup();
         
-    	// TODO Check network connectivity
-    	//...
-    	
         // Create an Intent to launch an Activity for the tab (to be reused)
         addTab(TABTAG_MARKET, "Market", 
-                new Intent().setClass(this, MarketActivity.class));
+                new Intent(this, MarketActivity.class),
+                R.drawable.ic_tab_dollar);
         addTab(TABTAG_STOCK, "Stock", 
-                new Intent().setClass(this, StockActivity.class));
+                new Intent(this, StockActivity.class),
+                R.drawable.ic_tab_chart);
         addTab(TABTAG_NEWS, "News", 
-                new Intent().setClass(this, NewsActivity.class));
+                new Intent(this, NewsActivity.class),
+                R.drawable.ic_tab_news);
     
-        // When a tab switches check to see if new RSS feeds are available for
-        // the tab. Then sends a broadcast message to refresh the tab.
+        // TODO REMOVE if not needed
         getTabHost().setOnTabChangedListener(mOnTabChangeListener);
     }
     
@@ -112,18 +114,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         }
     };
             
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-    }
-    
-    @Override
-    public void onResume()
-    {
-        super.onResume();
-    }
-    
     /**
      * This gets called before onDestroy(). 
      * Pass forward a reference to sync manager which contains async task
@@ -146,6 +136,22 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         Intent intent = new Intent(Consts.REFRESH_STOCK_VIEW);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
+    
+    /** 
+     * Check for Network Availability
+     * 
+     * @return True if network is available
+     */
+    public boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        // if no network is available networkInfo will be null, otherwise
+        // check if we are connected
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
+    }
 
     /**
      * Add a new tab to TabActivity
@@ -154,9 +160,9 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
      * @param caption
      * @param intent
      */
-    private void addTab(String tag, String caption, Intent intent) {
+    private void addTab(String tag, String caption, Intent intent, int resourceId) {
         TabHost.TabSpec spec = getTabHost().newTabSpec(tag).setIndicator(
-                caption,getResources().getDrawable(R.drawable.ic_menu_settings))
+                caption,getResources().getDrawable(resourceId))
                 .setContent(intent);
         getTabHost().addTab(spec);
     }
@@ -236,7 +242,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             
         } else if (item.getItemId() == MENU_STOCK_REFRESH) {
             Log.v(TAG, "menu id:" + MENU_STOCK_REFRESH);
-            syncStocks();
+            mStockSyncMan.syncForce(symbols);
         }
 
         // Returning true ensures that the menu event is not be further
@@ -315,10 +321,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         mNewsSyncMan.sync(topics.toArray(new String[]{})); 
     }
     
-    private void syncStocks(){
-        mStockSyncMan.syncForce(symbols); // TODO DEBUG ONLY
-    }
-    
     /**
      * Run first time initialization after the install
      */
@@ -329,6 +331,13 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             String[] prefList = getResources().getStringArray(R.array.subscriptionoptions_keys);
             setPreference(prefList[0], true); // show 'US market' tab
             setPreference(prefList[1], true); // show 'Most Popular' tab
+            
+            if(isNetworkAvailable()){
+                // Sync the stock and market
+                mStockSyncMan.syncForce(symbols);
+                // Sync the news
+                syncNews();
+            }                
         }
     }
     

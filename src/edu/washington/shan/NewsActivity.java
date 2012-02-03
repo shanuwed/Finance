@@ -1,10 +1,5 @@
 package edu.washington.shan;
 
-import edu.washington.shan.news.DBAdapter;
-import edu.washington.shan.news.DBConstants;
-import edu.washington.shan.news.NewsViewBinder;
-import edu.washington.shan.news.PrefKeyManager;
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,13 +10,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import edu.washington.shan.news.DBAdapter;
+import edu.washington.shan.news.DBConstants;
+import edu.washington.shan.news.NewsViewBinder;
 
 /**
+ * Activity for the News tab
  * @author shan@uw.edu
  *
  */

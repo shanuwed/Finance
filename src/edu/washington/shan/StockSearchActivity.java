@@ -5,18 +5,13 @@ package edu.washington.shan;
 
 import android.app.ListActivity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.SimpleCursorAdapter;
-import edu.washington.shan.stock.StockViewBinder;
-import edu.washington.shan.stock.DBAdapter;
-import edu.washington.shan.stock.DBConstants;
 
 /**
+ * Allows to search for a stock symbol and add it
  * @author shan@uw.edu
  *
  */

@@ -1,31 +1,48 @@
 package edu.washington.shan;
 
+import java.io.IOException;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import android.app.Activity;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.net.Uri;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import edu.washington.shan.stock.StockViewBinder;
 import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
+import edu.washington.shan.stock.StockViewBinder;
 
 /**
  * Activity for the Market tab
- *
- */
+ * @author shan@uw.edu
+*/
 public class MarketActivity extends ListActivity {
     
     private static final String TAG = "MarketActivity";
     private RefreshBroadcastReceiver refreshBroadcastReceiver;
     private DBAdapter mDbAdapter;
+    private ImageDownloadTask mDownloadTask; // consider adding to onRetainNonConfigurationInstance
 
     /** Called when the activity is first created. */
     @Override
@@ -43,6 +60,10 @@ public class MarketActivity extends ListActivity {
             mDbAdapter.open();
         }
         fillData();
+        
+        mDownloadTask = new ImageDownloadTask(this);
+        mDownloadTask
+            .execute("http://www.google.com/finance/chart?cht=c&q=INDEXDJX:.DJI,INDEXSP:.INX,INDEXNASDAQ:.IXIC&tlf=12h");
         
         refreshBroadcastReceiver = new RefreshBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).
@@ -142,6 +163,57 @@ public class MarketActivity extends ListActivity {
             {
                 Log.v(TAG, "RefreshBroadcastReceiver for market");
                 fillData();
+            }
+        }
+    }
+    
+    private class ImageDownloadTask extends AsyncTask<String, Void, Bitmap> {
+
+        private static final String TAG = "ImageDownloadTask";
+
+        private Context mContext;
+        private Bitmap mBitmap;
+
+        public ImageDownloadTask(Context context) {
+            mContext = context;
+            mBitmap = null;
+        }
+
+        public void setContext(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... args) {
+            try {
+                String url = args[0];
+                HttpUriRequest request = new HttpGet(url.toString());
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpResponse response = httpClient.execute(request);
+
+                StatusLine statusLine = response.getStatusLine();
+                int statusCode = statusLine.getStatusCode();
+                if (statusCode == 200) {
+                    HttpEntity entity = response.getEntity();
+                    byte[] bytes = EntityUtils.toByteArray(entity);
+
+                    mBitmap = BitmapFactory.decodeByteArray(bytes, 0,
+                            bytes.length);
+                    return mBitmap;
+                }
+            } catch (ClientProtocolException e) {
+                Log.e(TAG, e.getMessage(),e);
+            } catch (IOException e) {
+                Log.e(TAG, e.getMessage(),e);
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Bitmap bitmap) {
+            if(bitmap != null){
+                ImageView imageView = (ImageView) ((Activity) mContext)
+                        .findViewById(R.id.market_imageView1);
+                imageView.setImageBitmap(mBitmap);
             }
         }
     }

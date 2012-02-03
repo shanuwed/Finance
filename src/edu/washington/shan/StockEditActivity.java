@@ -23,7 +23,7 @@ import edu.washington.shan.stock.DBConstants;
 
 /**
  * Stock edit activity allows a user to remove a stock item
- * 
+ * @author shan@uw.edu
  */
 public class StockEditActivity extends ListActivity {
 

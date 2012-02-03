@@ -6,11 +6,6 @@ package edu.washington.shan.news;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.washington.shan.R;
-
-import android.content.Context;
-import android.content.res.Resources;
-
 /**
  * @author shan@uw.edu
  * 
