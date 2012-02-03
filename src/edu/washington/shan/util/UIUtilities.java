@@ -16,8 +16,14 @@
 
 package edu.washington.shan.util;
 
+import edu.washington.shan.Consts;
+import edu.washington.shan.R;
+import edu.washington.shan.WebviewActivity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.view.View;
 import android.view.LayoutInflater;
 import android.widget.TextView;
@@ -27,6 +33,24 @@ import android.widget.Toast;
 
 public class UIUtilities {
     private UIUtilities() {
+    }
+    
+    public static void browse(Context context, String title, String url) {
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getResources().getString(R.string.pref_filename), 
+                Context.MODE_PRIVATE);
+        if (sharedPref.getBoolean("settings_use_external_browser", false)) {
+            // start the url in the default browser
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            context.startActivity(i);
+        } else {
+            // start the url in Webview
+            Intent i = new Intent(context, WebviewActivity.class);
+            i.putExtra(Consts.WEBVIEW_TITLE, title);
+            i.putExtra(Consts.WEBVIEW_URL, url);
+            context.startActivity(i);
+        }
     }
 
     public static void showImageToast(Context context, int id, Drawable drawable,

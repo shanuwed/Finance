@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -16,6 +15,7 @@ import android.widget.SimpleCursorAdapter;
 import edu.washington.shan.news.DBAdapter;
 import edu.washington.shan.news.DBConstants;
 import edu.washington.shan.news.NewsViewBinder;
+import edu.washington.shan.util.UIUtilities;
 
 /**
  * Activity for the News tab
@@ -39,7 +39,7 @@ public class NewsActivity extends ListActivity {
         if(null != (mDbAdapter = (DBAdapter) getLastNonConfigurationInstance ())){
             mDbAdapter.open();
         }else{
-            // Always use the application context instead of 'this' context.
+            // Always use the application context instead of activity context.
             mDbAdapter = new DBAdapter(getApplicationContext());
             mDbAdapter.open();
         }
@@ -77,12 +77,9 @@ public class NewsActivity extends ListActivity {
         startManagingCursor(cursor);
         if (cursor != null) {
             int colIndex = cursor.getColumnIndex(DBConstants.URL_NAME);
-            String uri = cursor.getString(colIndex);
-            if (uri != null && uri.length() > 0) {
-                // Intent to open a browser
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse(uri));
-                startActivity(i);
+            String url = cursor.getString(colIndex);
+            if (url != null && url.length() > 0) {
+                UIUtilities.browse(this, url, url);
             }
         }
     }

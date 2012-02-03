@@ -11,46 +11,55 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 /**
  * Displays the stock detail in a web view
  * @author shan@uw.edu
  * 
  */
-public class StockDetailActivity extends Activity {
+public class WebviewActivity extends Activity {
 
-    private static final String TAG = "StockDetailActivity";
-    // append stock symbol
-    private static final String mStartUrl = "http://www.google.com/finance?q=NASDAQ:";
+    private static final String TAG = "WebviewActivity";
+    
     private WebView mWebView;
+    private TextView mTextView; // title
+    private ProgressBar mProgressBar;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.stock_detail);
-
-        // wire the progress bar
-        // mProgressBar = (ProgressBar) findViewById(R.id.main_progressBar1);
-
-        String url = mStartUrl;
-        Intent intent = this.getIntent();
-        if(intent != null){
-            String symbol = intent.getStringExtra(Consts.STOCK_SYMBOL);
-            if(symbol != null && symbol.length() >= 0){
-                url += symbol;
-            }else{
-                url = "http://www.google.com/finance"; // fallback
-            }
-        }
-        
-        Log.v(TAG, "Navigating to url:" + url);
+        setContentView(R.layout.webview);
 
         // wire the webview
-        mWebView = (WebView) findViewById(R.id.stock_detail_webView1);
+        mWebView = (WebView) findViewById(R.id.webview_webView1);
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.setWebViewClient(new HelloWebViewClient());
-        mWebView.loadUrl(url);
+        
+        // wire the progress bar
+        mProgressBar = (ProgressBar) findViewById(R.id.webview_progressBar1);
+        
+        // wire the textview
+        mTextView = (TextView) findViewById(R.id.webview_title);
+
+        // Extract the arguments from the intent
+        Intent intent = this.getIntent();
+        if(intent != null){
+            String title = intent.getStringExtra(Consts.WEBVIEW_TITLE);
+            if(title != null && title.length() >= 0){
+                mTextView.setText(title);
+            }else{
+                mTextView.setText("Browse");
+            }
+            
+            String url = intent.getStringExtra(Consts.WEBVIEW_URL);
+            if(url != null && url.length() >=0){
+                Log.v(TAG, "Navigating to url:" + url);
+                mWebView.loadUrl(url);
+            }
+        }
     }
 
     /**
@@ -75,13 +84,13 @@ public class StockDetailActivity extends Activity {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
 
-            // mProgressBar.setVisibility(ProgressBar.GONE);
+            mProgressBar.setVisibility(ProgressBar.GONE);
         }
 
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
 
-            // mProgressBar.setVisibility(ProgressBar.VISIBLE);
+            mProgressBar.setVisibility(ProgressBar.VISIBLE);
         }
     }
 }

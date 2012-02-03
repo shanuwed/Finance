@@ -151,7 +151,7 @@ public class DBAdapter {
     		null,
     		null,
     		null,
-    		null);
+    		DBConstants.TIME_NAME + " DESC");
     }
     
     /**

@@ -5,7 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -15,6 +17,7 @@ import android.widget.SimpleCursorAdapter;
 import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
 import edu.washington.shan.stock.StockViewBinder;
+import edu.washington.shan.util.UIUtilities;
 
 /**
  * Handles the Stock tab
@@ -77,10 +80,7 @@ public class StockActivity extends ListActivity {
             int colIndex = cursor.getColumnIndex(DBConstants.symbol_NAME);
             String symbol = cursor.getString(colIndex);
             if (symbol != null && symbol.length() > 0) {
-                // Intent to open Stock detail activity
-                Intent i = new Intent(this, StockDetailActivity.class);
-                i.putExtra(Consts.STOCK_SYMBOL, symbol);
-                startActivity(i);
+                UIUtilities.browse(this, symbol, Consts.STOCK_URL + symbol);
             }else{
                 Log.e(TAG, "symbol retreived from the database is invalid");
             }

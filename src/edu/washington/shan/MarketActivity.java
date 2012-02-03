@@ -18,9 +18,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -28,10 +30,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
 import edu.washington.shan.stock.StockViewBinder;
+import edu.washington.shan.util.UIUtilities;
 
 /**
  * Activity for the Market tab
@@ -99,10 +103,7 @@ public class MarketActivity extends ListActivity {
             int colIndex = cursor.getColumnIndex(DBConstants.symbol_NAME);
             String symbol = cursor.getString(colIndex);
             if (symbol != null && symbol.length() > 0) {
-                // Intent to open Stock detail activity
-                Intent i = new Intent(this, StockDetailActivity.class);
-                i.putExtra(Consts.STOCK_SYMBOL, symbol);
-                startActivity(i);
+                UIUtilities.browse(this, symbol, Consts.STOCK_URL + symbol);
             }else{
                 Log.e(TAG, "symbol retreived from the database is invalid");
             }
@@ -179,6 +180,7 @@ public class MarketActivity extends ListActivity {
             mBitmap = null;
         }
 
+        @SuppressWarnings("unused")
         public void setContext(Context context) {
             mContext = context;
         }
@@ -215,6 +217,9 @@ public class MarketActivity extends ListActivity {
                         .findViewById(R.id.market_imageView1);
                 imageView.setImageBitmap(mBitmap);
             }
+            ProgressBar progressBar = (ProgressBar) ((Activity) mContext)
+                .findViewById(R.id.market_progressBar1);
+            progressBar.setVisibility(ProgressBar.GONE);
         }
     }
 }

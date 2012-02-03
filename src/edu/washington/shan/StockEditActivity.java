@@ -33,7 +33,6 @@ public class StockEditActivity extends ListActivity {
     private Button mRemoveButton;
     private Button mDoneButton;
     private List<Map<String, Object>> mRows = new ArrayList<Map<String, Object>>();
-    private List<String> mSymbolsToRemove = new ArrayList<String>();
 
 
     @Override
@@ -110,7 +109,7 @@ public class StockEditActivity extends ListActivity {
                 CheckBox checkBox = (CheckBox)childView.findViewById(R.id.stock_edit_row_checkBox1);
                 if(checkBox != null && checkBox.isChecked()){
                     TextView textView = (TextView)childView.findViewById(R.id.stock_edit_row_text1);
-                    mSymbolsToRemove.add(textView.getText().toString());
+                    mDbAdapter.removeItemsBySymbols(new String[] {textView.getText().toString()});
                     //Log.v(TAG, "removing item " + textView.getText());
                     mRows.remove(index);
                 }
@@ -123,8 +122,6 @@ public class StockEditActivity extends ListActivity {
 
         @Override
         public void onClick(View v) {
-            
-            mDbAdapter.removeItemsBySymbols(mSymbolsToRemove.toArray(new String[]{}));
             finish();
         }
     };

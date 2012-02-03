@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <TextView
         style="?android:attr/listSeparatorTextViewStyle"
         android:id="@+android:id/stock_title"
         android:text="Edit Portfolio"/>

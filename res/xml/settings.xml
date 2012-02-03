@@ -19,6 +19,11 @@
 	        android:title="@string/settings_sync_title"
 	        android:summary="@string/settings_sync_summary" />
 	    
-    </PreferenceCategory>
+        <CheckBoxPreference
+            android:key="settings_use_external_browser"
+            android:title="@string/settings_use_external_browser_title"
+            android:summary="@string/settings_use_external_browser_summary" />
+        
+	    </PreferenceCategory>
     
 </PreferenceScreen>        

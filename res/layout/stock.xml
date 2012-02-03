@@ -20,8 +20,7 @@
 	    <ListView
 	        android:id="@android:id/list"
 	        android:layout_width="fill_parent"
-	        android:layout_height="wrap_content"
-	        android:drawSelectorOnTop="true" />
+	        android:layout_height="wrap_content"/>
 	
 	    <TextView
 	        android:id="@android:id/empty"
