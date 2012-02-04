@@ -1,10 +1,14 @@
 package edu.washington.shan;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -15,6 +19,7 @@ import android.widget.SimpleCursorAdapter;
 import edu.washington.shan.news.DBAdapter;
 import edu.washington.shan.news.DBConstants;
 import edu.washington.shan.news.NewsViewBinder;
+import edu.washington.shan.news.PrefKeyManager;
 import edu.washington.shan.util.UIUtilities;
 
 /**
@@ -89,12 +94,8 @@ public class NewsActivity extends ListActivity {
      */
     private void fillData() {
         try {
-            // int topicId = PrefKeyManager.getInstance().keyToValue(mTabTag);
-            // Log.v(TAG, "fillData called for key: " + mTabTag + " topicId: " +
-            // topicId);
-
             // Get the rows from the database and create the item list
-            Cursor mCursor = mDbAdapter.fetchAllItems();
+            Cursor mCursor = mDbAdapter.fetchItemsByTopicIds(getCurrentTopicIds());
             startManagingCursor(mCursor);
 
             // Specify the fields we want to display in the list
@@ -117,6 +118,23 @@ public class NewsActivity extends ListActivity {
         } catch (java.lang.RuntimeException e) {
             Log.e(TAG, "Exception in fillData", e);
         }
+    }
+
+    /**
+     * @return
+     */
+    private Long[] getCurrentTopicIds() {
+        List<Long> topics = new ArrayList<Long>();
+        
+        SharedPreferences sharedPref = getSharedPreferences(
+                getResources().getString(R.string.pref_filename), 
+                MODE_PRIVATE);
+        String[] prefs = getResources().getStringArray(R.array.subscriptionoptions_keys);
+        for(String pref : prefs) {
+            if(sharedPref.getBoolean(pref, false))
+                topics.add((long)PrefKeyManager.getInstance().keyToValue(pref));
+        }
+        return topics.toArray(new Long[]{});
     }
 
     /**

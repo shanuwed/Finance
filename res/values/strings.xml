@@ -3,19 +3,15 @@
 
     <string name="app_name">Finance</string>
         
-    <string name="settings_xyz_defaultvalue">xyz-default</string>
-    <string name="settings_xyz_title">xyz-title</string>
-    <string name="settings_xyz_summary">xyz-summary</string>
-    
     <string name="error_already_in_progress">Download is already in progress</string>
     
     <!-- Following is the News reader strings -->    
-    <string name="help_dialog_title">Yafi RSS Reader</string>
+    <string name="help_dialog_title">Finance</string>
     <string name="help_dialog_msg">Powered by Yahoo! Finance</string>
     <string name="help_dialog_okay">Ok</string>
     <string name="rss_retrieval_failed">Cannot retrieve RSS feed. Please try again later.</string>
-    <string name="prefscreen_title">RSS Subscription Preferences</string>
-    <string name="prefscreen_summary">RSS Subscription Preferences</string>
+    <string name="prefscreen_title">Subscription Preferences</string>
+    <string name="prefscreen_summary">Subscription Preferences</string>
     <string name="settings_prefscreen_title">Setting Preferences</string>
     <string name="settings_prefscreen_summary">Setting Preferences</string>
     <string name="no_data">No data</string>
@@ -26,13 +22,13 @@
     <string name="menu_title_help">Help</string>
     <string name="settings_title">Settings</string>
     <string name="settings_saving_policy_title">Retention Policy</string>
-    <string name="settings_saving_policy_summary">Delete News older than 30 days</string>
+    <string name="settings_saving_policy_summary">Delete news older than 20 days</string>
     <string name="settings_sync_title">Auto sync</string>
     <string name="settings_sync_summary">Automatically sync stock data and news</string>
     <string name="settings_rss_feed_save_key">settings_rss_feed_save</string>
     <string name="settings_auto_sync_key">settings_auto_sync</string>
     <string name="settings_use_external_browser_title">Use external browser</string>
-    <string name="settings_use_external_browser_summary">Use external browser when displaying stock details</string>
+    <string name="settings_use_external_browser_summary">Use external browser when displaying web content for news and stocks</string>
     <string name="mark_as_favorite_key">Placeholder for internal use of the resource Id</string>
         
     <!-- Used as tab and preference labels -->

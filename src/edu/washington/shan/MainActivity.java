@@ -1,12 +1,16 @@
 package edu.washington.shan;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -14,15 +18,19 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.webkit.WebView;
 import android.widget.TabHost;
 import android.widget.Toast;
 import edu.washington.shan.news.Constants;
 import edu.washington.shan.news.NewsSyncManager;
 import edu.washington.shan.news.PrefKeyManager;
 import edu.washington.shan.news.SubscriptionPrefActivity;
+import edu.washington.shan.stock.DBConstants;
 import edu.washington.shan.stock.StockSyncManager;
 
 /**
@@ -49,12 +57,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     private NewsSyncManager mNewsSyncMan;
     private PrefKeyManager mPrefKeyManager;
 
-    // Use these stock symbols during the first run 
-    // after the install to get some data displayed
-    private static final String[] symbols = 
-        new String[]{"IBM","MSFT","YHOO","GOOG","AMZN",".DJI",".INX",".IXIC"};
-    
-    
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,8 +64,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         
     	super.onCreate(savedInstanceState);
     	setContentView(R.layout.main);
-    	
-    	initialize();
     	
         // Check to see if we're restarting with an instance of stock sync manager.
         // If so, restore the sync manager instance.
@@ -80,9 +80,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 getResources().getStringArray(R.array.subscriptionoptions_keys));
         
         
-        //cleanupOldFeeds();
-        clearFirstTimeRunFlag();
-        //syncAtStartup();
+        initialize();
         
         // Create an Intent to launch an Activity for the tab (to be reused)
         addTab(TABTAG_MARKET, "Market", 
@@ -94,26 +92,22 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         addTab(TABTAG_NEWS, "News", 
                 new Intent(this, NewsActivity.class),
                 R.drawable.ic_tab_news);
-    
-        // TODO REMOVE if not needed
-        getTabHost().setOnTabChangedListener(mOnTabChangeListener);
     }
     
-    // TODO REMOVE if not needed
-    private TabHost.OnTabChangeListener mOnTabChangeListener = 
-        new TabHost.OnTabChangeListener() {
+    /**
+     * Add a new tab to TabActivity
+     * 
+     * @param tag
+     * @param caption
+     * @param intent
+     */
+    private void addTab(String tag, String caption, Intent intent, int resourceId) {
+        TabHost.TabSpec spec = getTabHost().newTabSpec(tag).setIndicator(
+                caption,getResources().getDrawable(resourceId))
+                .setContent(intent);
+        getTabHost().addTab(spec);
+    }
 
-        @Override
-        public void onTabChanged(String tabId) {
-            // tabId == tabTag
-            if (tabId.equals(TABTAG_STOCK)) {
-
-            } else if (tabId.equals(TABTAG_NEWS)) {
-
-            }
-        }
-    };
-            
     /**
      * This gets called before onDestroy(). 
      * Pass forward a reference to sync manager which contains async task
@@ -151,20 +145,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             return true;
         }
         return false;
-    }
-
-    /**
-     * Add a new tab to TabActivity
-     * 
-     * @param tag
-     * @param caption
-     * @param intent
-     */
-    private void addTab(String tag, String caption, Intent intent, int resourceId) {
-        TabHost.TabSpec spec = getTabHost().newTabSpec(tag).setIndicator(
-                caption,getResources().getDrawable(resourceId))
-                .setContent(intent);
-        getTabHost().addTab(spec);
     }
 
     /**
@@ -214,7 +194,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             startActivityForResult(intent, ACTIVITY_SETTINGS);
 
         } else if (item.getItemId() == R.id.mainmenu_help) {
-            // Utils.showAboutDialogBox(this);
+            showAboutDialogBox();
 
         } else if (item.getItemId() == MENU_NEWS_SUBSCRIPTION) {
             Log.v(TAG, "menu id:" + MENU_NEWS_SUBSCRIPTION);
@@ -242,7 +222,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             
         } else if (item.getItemId() == MENU_STOCK_REFRESH) {
             Log.v(TAG, "menu id:" + MENU_STOCK_REFRESH);
-            mStockSyncMan.syncForce(symbols);
+            syncStocks();
         }
 
         // Returning true ensures that the menu event is not be further
@@ -261,6 +241,10 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         if(requestCode == MENU_STOCK_ADDTICKER && resultCode == RESULT_OK){
             String symbol = data.getExtras().getString(Consts.NEW_TICKER_ADDED);
             mStockSyncMan.syncForce(new String[]{symbol});
+        }else if(requestCode == MENU_NEWS_SUBSCRIPTION){
+            // signal the News activity that it needs to refresh the list view
+            Intent intent = new Intent(Consts.REFRESH_NEWS_VIEW);
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -307,70 +291,97 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         }
     };
     
+    /**
+     * Retrieve stock symbols from the db and update ticks 
+     */
+    private void syncStocks() {
+        List<String> symbols = new ArrayList<String>();
+        
+        // Retrieve the stock symbols...
+        edu.washington.shan.stock.DBAdapter dbAdapter = 
+            new edu.washington.shan.stock.DBAdapter(this);
+        dbAdapter.open();
+        Cursor cursor = dbAdapter.fetchAllSymbols();
+        if(cursor != null && cursor.getCount() > 0){
+            do {
+                int index = cursor.getColumnIndex(DBConstants.symbol_NAME);
+                symbols.add(cursor.getString(index));
+            }while(cursor.moveToNext());
+        }
+        dbAdapter.close();
+        if(symbols.size() > 0)
+            mStockSyncMan.syncForce(symbols.toArray(new String[]{}));
+    }
+    
     private void syncNews() {
-        String[] prefs = getResources().getStringArray(R.array.subscriptionoptions_keys);
-        ArrayList<String> topics = new ArrayList<String>();
+        List<String> topics = new ArrayList<String>();
+        
         SharedPreferences sharedPref = getSharedPreferences(
                 getResources().getString(R.string.pref_filename), 
                 MODE_PRIVATE);
+        String[] prefs = getResources().getStringArray(R.array.subscriptionoptions_keys);
         for(String pref : prefs) {
             if(sharedPref.getBoolean(pref, false))
                 topics.add(pref);
         }
         // pass in the topics of RSS feeds to retrieve
-        mNewsSyncMan.sync(topics.toArray(new String[]{})); 
+        if(topics.size() > 0)
+            mNewsSyncMan.sync(topics.toArray(new String[]{})); 
     }
     
     /**
      * Run first time initialization after the install
      */
     private void initialize() {
-        if(isFirstTimeRunFlagSet()) {
+        // Use these stock symbols during the first run after install
+        final String[] symbols = 
+            new String[]{"IBM","MSFT","YHOO","GOOG","AMZN",".DJI",".INX",".IXIC"};
+
+        SharedPreferences sharedPref = getSharedPreferences(
+                getResources().getString(R.string.pref_filename), 
+                MODE_PRIVATE);
+        
+        // is this the first time running the app?
+        if(!sharedPref.getBoolean("initialized", false)) {
             
-            // Forces to create a preference: <boolean name="usmarkets" value="true" />
+            // Create preferences like <boolean name="usmarkets" value="true" />
+            // so that we can download RSS news feeds for them.
             String[] prefList = getResources().getStringArray(R.array.subscriptionoptions_keys);
-            setPreference(prefList[0], true); // show 'US market' tab
-            setPreference(prefList[1], true); // show 'Most Popular' tab
+            setPreference(prefList[0], true); // 'US market' 
+            setPreference(prefList[1], true); // 'Most Popular' 
             
+            // If network is available sync the stock and news
             if(isNetworkAvailable()){
-                // Sync the stock and market
+                // Sync the stocks
                 mStockSyncMan.syncForce(symbols);
                 // Sync the news
                 syncNews();
-            }                
+            }
+            
+            showAboutDialogBox();
+            setPreference("initialized", true);// Clear 'first time run' flag
+            
+        }else{
+            
+            // delete old rss feeds?
+            if(sharedPref.getBoolean(
+                    getResources().getString(R.string.settings_rss_feed_save_key), false)){
+                edu.washington.shan.news.DBAdapter dbAdapter = 
+                    new edu.washington.shan.news.DBAdapter(this);
+                dbAdapter.open();
+                dbAdapter.deleteItemsOlderThan(Constants.RETENTION_IN_DAYS); // x days
+                dbAdapter.close();
+            }
+            
+            // automatically sync?
+            if(sharedPref.getBoolean(
+                    getResources().getString(R.string.settings_auto_sync_key), false)){
+                syncNews();
+                syncStocks(); // TODO be sure to sync market graph aswell
+            }
         }
     }
-    
-    /**
-     * Returns true if this is first time app is launched
-     * @return
-     */
-    private boolean isFirstTimeRunFlagSet(){
-        // Determine if this is the first time running the app
-        // Shared preference for 'initialized' is stored in 
-        // MainActivity.xml preference file which is different 
-        // from the subscription preferences file.
-        SharedPreferences sharedPref = getSharedPreferences(
-                getResources().getString(R.string.pref_filename), 
-                MODE_PRIVATE);
-        if(!sharedPref.getBoolean("initialized", false))
-            return true;
-        return false;
-    }
-    
-    /**
-     * Clears 'first time run' flag
-     */
-    private void clearFirstTimeRunFlag(){
-        SharedPreferences sharedPref = getSharedPreferences(
-                getResources().getString(R.string.pref_filename), 
-                MODE_PRIVATE);
-        // Now set the "initialized" flag
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean("initialized", true);
-        editor.commit();
-    }
-    
+
     /**
      * Given a preference key and a value it sets the shared preference
      * @param prefKey
@@ -386,4 +397,24 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         editor.commit();
     }
     
+    /**
+     * 
+     */
+    private void showAboutDialogBox() {
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+        View dlgView = inflater.inflate(R.layout.help_dialog_layout, null);
+
+        WebView webview = (WebView) dlgView.findViewById(R.id.help_dialog_layout_webView1);
+        webview.loadUrl("file:///android_asset/readme.html");
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(getResources().getString(R.string.help_dialog_title));
+        builder.setView(dlgView);
+
+        builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        }).show();
+    }
 }

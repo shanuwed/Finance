@@ -280,6 +280,29 @@ public class DBAdapter {
         return cursor;
     }
     
+    /**
+     * Return a Cursor over the list of all stock symbols in the database
+     * 
+     * @return Cursor over all symbols
+     */
+    public Cursor fetchAllSymbols() {
+
+        Cursor cursor = mDb.query(DBConstants.TABLE_NAME, new String[] {
+            DBConstants.KEY_ID, 
+            DBConstants.symbol_NAME
+            }, 
+            null, 
+            null,
+            null,
+            null,
+            null,
+            null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+    
     public boolean doesItemExist(String symbol) {
         boolean result = false;
         Cursor cursor = null;

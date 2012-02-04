@@ -240,6 +240,46 @@ public class DBAdapter {
         }
         return cursor;
     }
+    
+    /**
+     * Returns a Cursor positioned at the begining of a item that matches a given topic IDs
+     * @param topicIds
+     * @return
+     * @throws SQLException
+     */
+    public Cursor fetchItemsByTopicIds(Long[] topicIds) throws SQLException {
+        
+        StringBuilder sb = new StringBuilder();
+        for(int index=0; index<topicIds.length; index++){
+            if(index==0){
+                sb.append(DBConstants.TOPICID_NAME + "=" + topicIds[index]);
+            }else{
+                sb.append(" OR ");
+                sb.append(DBConstants.TOPICID_NAME + "=" + topicIds[index]);
+            }
+        }
+        
+        Cursor cursor =
+            mDb.query(true, // distinct
+                DBConstants.TABLE_NAME, // table 
+                new String[] { // columns
+                DBConstants.KEY_ID, 
+                DBConstants.TITLE_NAME,
+                DBConstants.URL_NAME,
+                DBConstants.TIME_NAME,
+                DBConstants.TOPICID_NAME,
+                DBConstants.STATUS_NAME}, 
+                sb.toString(), 
+                null,
+                null,
+                null,
+                DBConstants.TIME_NAME + " DESC",
+                null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
 
     /**
      * Return a Cursor positioned at the item that matches the given rowId

@@ -78,18 +78,20 @@ public class StockEditActivity extends ListActivity {
             Cursor cursor = mDbAdapter.fetchAllItems();
             startManagingCursor(cursor);
 
-            do {
-                Map<String, Object> row = new HashMap<String, Object>();
-                int columnIndex = cursor
-                        .getColumnIndexOrThrow(DBConstants.symbol_NAME);
-                row.put(DBConstants.symbol_NAME, 
-                        cursor.getString(columnIndex));
-                columnIndex = cursor
-                        .getColumnIndexOrThrow(DBConstants.company_NAME);
-                row.put(DBConstants.company_NAME, 
-                        cursor.getString(columnIndex));
-                mRows.add(row);
-            } while (cursor.moveToNext());
+            if(cursor != null && cursor.getCount() > 0){
+                do {
+                    Map<String, Object> row = new HashMap<String, Object>();
+                    int columnIndex = cursor
+                            .getColumnIndexOrThrow(DBConstants.symbol_NAME);
+                    row.put(DBConstants.symbol_NAME, 
+                            cursor.getString(columnIndex));
+                    columnIndex = cursor
+                            .getColumnIndexOrThrow(DBConstants.company_NAME);
+                    row.put(DBConstants.company_NAME, 
+                            cursor.getString(columnIndex));
+                    mRows.add(row);
+                } while (cursor.moveToNext());
+            }
 
         } catch (java.lang.IllegalStateException e) {
             Log.e(TAG, "Exception caught in getData", e);
