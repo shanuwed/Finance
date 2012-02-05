@@ -25,11 +25,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import edu.washington.shan.stock.DBAdapter;
 import edu.washington.shan.stock.DBConstants;
 import edu.washington.shan.stock.StockViewBinder;
@@ -57,7 +62,7 @@ public class MarketActivity extends ListActivity {
         if(null != (mDbAdapter = (DBAdapter) getLastNonConfigurationInstance ())){
             mDbAdapter.open();
         }else{
-            // Always use the application context instead of 'this' context.
+            // Always use the application context instead of activity context.
             mDbAdapter = new DBAdapter(getApplicationContext());
             mDbAdapter.open();
         }
@@ -71,6 +76,7 @@ public class MarketActivity extends ListActivity {
         LocalBroadcastManager.getInstance(this).
         registerReceiver(refreshBroadcastReceiver, 
                 new IntentFilter(Consts.REFRESH_STOCK_VIEW));
+        registerForContextMenu(getListView());
     }
     
     /* (non-Javadoc)
@@ -93,7 +99,66 @@ public class MarketActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+        browse(id);
+    }
 
+    /**
+     * Inflate context menu
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Choose");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.contextmenu, menu);
+    }
+
+    /**
+     * Handle context menu
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+                .getMenuInfo();
+        switch (item.getItemId()) {
+        case R.id.contextmenu_browse:
+            browse(info.id);
+            return true;
+
+        case R.id.contextmenu_share:
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("text/html");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+                    getUrl(info.id));
+            startActivity(Intent.createChooser(sharingIntent, "Share using"));
+            return true;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    /**
+     * Returns an URL associated with an item if it's valid. Returns a default
+     * URL otherwise.
+     * 
+     * @param id
+     * @return
+     */
+    private String getUrl(long id) {
+        // Using the id get the symbol from the db
+        Cursor cursor = mDbAdapter.fetchItemsByRowId(id);
+        startManagingCursor(cursor);
+        if (cursor != null) {
+            int colIndex = cursor.getColumnIndex(DBConstants.symbol_NAME);
+            String symbol = cursor.getString(colIndex);
+            if (symbol != null && symbol.length() > 0) {
+                return Consts.STOCK_URL + symbol;
+            }
+        }
+        return "http://www.google.com/finance"; // default
+    }
+    
+    private void browse(long id){
         // Using the id get the symbol from the db
         Cursor cursor = mDbAdapter.fetchItemsByRowId(id);
         startManagingCursor(cursor);
@@ -107,7 +172,7 @@ public class MarketActivity extends ListActivity {
             }
         }
     }
-
+     
     /**
      * Populate the list view from the data in db
      */

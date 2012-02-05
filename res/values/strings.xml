@@ -30,6 +30,8 @@
     <string name="settings_use_external_browser_title">Use external browser</string>
     <string name="settings_use_external_browser_summary">Use external browser when displaying web content for news and stocks</string>
     <string name="mark_as_favorite_key">Placeholder for internal use of the resource Id</string>
+    <string name="contextmenu_title_browse">Browse</string>
+    <string name="contextmenu_title_share">Share</string>
         
     <!-- Used as tab and preference labels -->
     <string name="title_usmarkets">U.S Markets</string>

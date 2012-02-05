@@ -13,9 +13,14 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import edu.washington.shan.news.DBAdapter;
 import edu.washington.shan.news.DBConstants;
 import edu.washington.shan.news.NewsViewBinder;
@@ -54,6 +59,7 @@ public class NewsActivity extends ListActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(
         refreshBroadcastReceiver,
                 new IntentFilter(Consts.REFRESH_NEWS_VIEW));
+        registerForContextMenu(getListView());
     }
 
     /* (non-Javadoc)
@@ -77,6 +83,54 @@ public class NewsActivity extends ListActivity {
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
 
+        String url = getUrl(id);
+        UIUtilities.browse(this, url, url);
+    }
+
+    /**
+     * Inflate context menu
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+            ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.setHeaderTitle("Choose");
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.contextmenu, menu);
+    }
+
+    /**
+     * Handle context menu
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+                .getMenuInfo();
+        switch (item.getItemId()) {
+        case R.id.contextmenu_browse:
+            String url = getUrl(info.id);
+            UIUtilities.browse(this, "News", url);
+            return true;
+
+        case R.id.contextmenu_share:
+            Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+            sharingIntent.setType("text/html");
+            sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+                    getUrl(info.id));
+            startActivity(Intent.createChooser(sharingIntent, "Share using"));
+            return true;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    /**
+     * Returns an URL associated with an item if it's valid. Returns a default
+     * URL otherwise.
+     * 
+     * @param id
+     * @return
+     */
+    private String getUrl(long id) {
         // Using the id get the URL from the db
         Cursor cursor = mDbAdapter.fetchItemsByRowId(id);
         startManagingCursor(cursor);
@@ -84,9 +138,10 @@ public class NewsActivity extends ListActivity {
             int colIndex = cursor.getColumnIndex(DBConstants.URL_NAME);
             String url = cursor.getString(colIndex);
             if (url != null && url.length() > 0) {
-                UIUtilities.browse(this, url, url);
+                return url;
             }
         }
+        return "http://www.google.com/finance"; // default
     }
 
     /**
@@ -95,7 +150,7 @@ public class NewsActivity extends ListActivity {
     private void fillData() {
         try {
             // Get the rows from the database and create the item list
-            Cursor mCursor = mDbAdapter.fetchItemsByTopicIds(getCurrentTopicIds());
+            Cursor mCursor = mDbAdapter.fetchItemsByTopicIds(getSelectedTopicIds());
             startManagingCursor(mCursor);
 
             // Specify the fields we want to display in the list
@@ -121,9 +176,10 @@ public class NewsActivity extends ListActivity {
     }
 
     /**
+     * Returns the topics selected by the user in the preferences
      * @return
      */
-    private Long[] getCurrentTopicIds() {
+    private Long[] getSelectedTopicIds() {
         List<Long> topics = new ArrayList<Long>();
         
         SharedPreferences sharedPref = getSharedPreferences(
