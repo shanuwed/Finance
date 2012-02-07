@@ -1,6 +1,8 @@
 package edu.washington.shan;
 
 import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -49,7 +51,10 @@ public class MarketActivity extends ListActivity {
     private static final String TAG = "MarketActivity";
     private RefreshBroadcastReceiver refreshBroadcastReceiver;
     private DBAdapter mDbAdapter;
-    private ImageDownloadTask mDownloadTask; // consider adding to onRetainNonConfigurationInstance
+    private ImageDownloadTask mDownloadTask;
+    private Map<String, Object> mConfigInstance; // to use onRetainNonConfigurationInstance
+    private final String DBADAPTER_KEY = "dbadapter";
+    private final String DOWNLOADTASK_KEY = "downloadtask";
 
     /** Called when the activity is first created. */
     @Override
@@ -59,18 +64,27 @@ public class MarketActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.market);
         
-        if(null != (mDbAdapter = (DBAdapter) getLastNonConfigurationInstance ())){
+        if(null != (mConfigInstance = (Map<String, Object>) getLastNonConfigurationInstance ())){
+            // Restore the adapter
+            mDbAdapter = (DBAdapter)mConfigInstance.get(DBADAPTER_KEY);
             mDbAdapter.open();
+            
+            // Restore the download task
+            mDownloadTask = (ImageDownloadTask) mConfigInstance.get(DOWNLOADTASK_KEY);
+            mDownloadTask.setContext(this); // give it a new context reference
+            if(mDownloadTask.getStatus() == AsyncTask.Status.FINISHED )
+                mDownloadTask.setImageInView();
         }else{
             // Always use the application context instead of activity context.
             mDbAdapter = new DBAdapter(getApplicationContext());
             mDbAdapter.open();
+            
+            mDownloadTask = new ImageDownloadTask(this);
+            mDownloadTask
+                .execute("http://www.google.com/finance/chart?cht=c&q=INDEXDJX:.DJI,INDEXSP:.INX,INDEXNASDAQ:.IXIC&tlf=12h");
         }
         fillData();
         
-        mDownloadTask = new ImageDownloadTask(this);
-        mDownloadTask
-            .execute("http://www.google.com/finance/chart?cht=c&q=INDEXDJX:.DJI,INDEXSP:.INX,INDEXNASDAQ:.IXIC&tlf=12h");
         
         refreshBroadcastReceiver = new RefreshBroadcastReceiver();
         LocalBroadcastManager.getInstance(this).
@@ -93,7 +107,10 @@ public class MarketActivity extends ListActivity {
      */
     @Override
     public Object onRetainNonConfigurationInstance() {
-        return mDbAdapter;
+        mConfigInstance = new Hashtable<String, Object>();
+        mConfigInstance.put(DBADAPTER_KEY, mDbAdapter);
+        mConfigInstance.put(DOWNLOADTASK_KEY, mDownloadTask);
+        return mConfigInstance;
     }
 
     @Override
@@ -243,7 +260,6 @@ public class MarketActivity extends ListActivity {
             mBitmap = null;
         }
 
-        @SuppressWarnings("unused")
         public void setContext(Context context) {
             mContext = context;
         }
@@ -267,7 +283,7 @@ public class MarketActivity extends ListActivity {
                     return mBitmap;
                 }
             } catch (ClientProtocolException e) {
-                Log.e(TAG, e.getMessage(),e);
+                Log.e(TAG, e.getMessage(),e); 
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage(),e);
             }
@@ -282,6 +298,17 @@ public class MarketActivity extends ListActivity {
             }
             ProgressBar progressBar = (ProgressBar) ((Activity) mContext)
                 .findViewById(R.id.market_progressBar1);
+            progressBar.setVisibility(ProgressBar.GONE);
+        }
+        
+        public void setImageInView() {
+            if (mBitmap != null) {
+                ImageView imageView = (ImageView) ((Activity) mContext)
+                        .findViewById(R.id.market_imageView1);
+                imageView.setImageBitmap(mBitmap);
+            }
+            ProgressBar progressBar = (ProgressBar) ((Activity) mContext)
+                    .findViewById(R.id.market_progressBar1);
             progressBar.setVisibility(ProgressBar.GONE);
         }
     }

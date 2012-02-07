@@ -23,7 +23,7 @@
 	        android:id="@+id/market_imageView1"
 	        android:layout_height="130px"
 	        android:layout_width="250px"
-	        android:layout_margin="10dip"/>
+	        android:padding="10dip"/>
     
         <ProgressBar
             android:id="@+id/market_progressBar1"
