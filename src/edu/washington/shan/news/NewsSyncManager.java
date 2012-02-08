@@ -62,34 +62,9 @@ public class NewsSyncManager {
                     mClientHandler, topics));
             mWorkerThread.start();
         } else {
-            Log.v(TAG, "download is already in progress");
+            Log.v(TAG, "news download is already in progress");
             UIUtilities.showToast(mContext,
                     R.string.error_already_in_progress);
         }
     }
-/*	
-	private Handler.Callback mPrivateCallback = new Handler.Callback() 
-	{
-		@Override
-		public boolean handleMessage(Message msg) {
-			Log.v(TAG, "Handler.Callback entered");
-			
-			Bundle bundle = msg.getData();
-			boolean[] results  = bundle.getBooleanArray(Constants.KEY_STATUS);
-			String[] tabTags = bundle.getStringArray(Constants.KEY_TAB_TAG);
-			
-            for (int index = 0; index < results.length; index++) {
-                Log.v(TAG, "result for " + tabTags[index] + " is " + results[index]);
-            }
-			
-			if(mClientHandler != null)
-			{
-				Message newMsg = mClientHandler.obtainMessage();
-				newMsg.copyFrom(msg);
-				mClientHandler.sendMessage(newMsg);
-			}
-			
-			return false;
-		}
-	};
-*/}
+}

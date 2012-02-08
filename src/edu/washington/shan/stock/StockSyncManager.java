@@ -74,7 +74,7 @@ public class StockSyncManager implements AsyncTaskCompleteListener<String> {
             mDownloadTask = new DownloadStockTask(mContext, this);
             mDownloadTask.execute(symbols);
         } else {
-            Log.v(TAG, "download is already in progress");
+            Log.v(TAG, "stocks download is already in progress");
             UIUtilities.showToast(mContext,
                     R.string.error_already_in_progress);
         }

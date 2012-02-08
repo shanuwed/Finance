@@ -56,6 +56,8 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     private StockSyncManager mStockSyncMan;
     private NewsSyncManager mNewsSyncMan;
     private PrefKeyManager mPrefKeyManager;
+    
+    private Thread mTimerThread;
 
     /** Called when the activity is first created. */
     @Override
@@ -250,8 +252,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     }
 
     /**
-     * Callback function for the background thread. This is called by the news
-     * update thread.
+     * Callback function for the background thread that retrieves the news. 
      */
     private Handler.Callback mCallback = new Handler.Callback() {
         @Override
@@ -313,6 +314,9 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             mStockSyncMan.syncForce(symbols.toArray(new String[]{}));
     }
     
+    /**
+     * Retrieve and update news
+     */
     private void syncNews() {
         List<String> topics = new ArrayList<String>();
         
@@ -373,15 +377,14 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 dbAdapter.close();
             }
             
-            // automatically sync?
-            if(sharedPref.getBoolean(
-                    getResources().getString(R.string.settings_auto_sync_key), false)){
-                syncNews();
-                syncStocks(); // TODO be sure to sync market graph aswell
-            }
+            syncNews();
+            
+            // Create and start timer thread 
+            mTimerThread = new Thread(new TimerRunnable(new Handler(mTimerCallback)));
+            mTimerThread.start();
         }
     }
-
+    
     /**
      * Given a preference key and a value it sets the shared preference
      * @param prefKey
@@ -416,5 +419,53 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 dialog.cancel();
             }
         }).show();
+    }
+      
+    /**
+     * Timer callback 
+     */
+    private Handler.Callback mTimerCallback = new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            Log.v(TAG, "Timer callback entered");
+            syncStocks();
+            return false;
+        }
+    };
+    
+    /**
+     * Background timer thread to sync stocks in a regular interval
+     *
+     */
+    private class TimerRunnable implements Runnable {
+        private static final String TAG = "TimerRunnable";
+        private Handler mHandler;
+        
+        public TimerRunnable(Handler handler){
+            mHandler = handler;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    // is automatic sync turned on?
+                    SharedPreferences sharedPref = getSharedPreferences(
+                            getResources().getString(R.string.pref_filename),
+                            MODE_PRIVATE);
+                    if (sharedPref.getBoolean(getResources().getString(
+                            R.string.settings_auto_sync_key), false)) {
+                        if (mHandler != null) {
+                            Message msg = mHandler.obtainMessage();
+                            msg.setData(new Bundle());
+                            mHandler.sendMessage(msg);
+                        }
+                    }
+                    Thread.sleep(4 * 60 * 1000); // 4 minutes
+                }
+            } catch (InterruptedException e) {
+                Log.e(TAG, "Caught exception", e);
+            }
+        }
     }
 }
