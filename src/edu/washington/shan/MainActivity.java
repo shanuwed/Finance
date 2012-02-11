@@ -30,6 +30,7 @@ import edu.washington.shan.news.Constants;
 import edu.washington.shan.news.NewsSyncManager;
 import edu.washington.shan.news.PrefKeyManager;
 import edu.washington.shan.news.SubscriptionPrefActivity;
+import edu.washington.shan.news.WorkerThreadRunnable;
 import edu.washington.shan.stock.DBConstants;
 import edu.washington.shan.stock.StockSyncManager;
 
@@ -242,7 +243,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         
         if(requestCode == MENU_STOCK_ADDTICKER && resultCode == RESULT_OK){
             String symbol = data.getExtras().getString(Consts.NEW_TICKER_ADDED);
-            mStockSyncMan.syncForce(new String[]{symbol});
+            mStockSyncMan.sync(new String[]{symbol});
         }else if(requestCode == MENU_NEWS_SUBSCRIPTION){
             // signal the News activity that it needs to refresh the list view
             Intent intent = new Intent(Consts.REFRESH_NEWS_VIEW);
@@ -311,7 +312,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         }
         dbAdapter.close();
         if(symbols.size() > 0)
-            mStockSyncMan.syncForce(symbols.toArray(new String[]{}));
+            mStockSyncMan.sync(symbols.toArray(new String[]{}));
     }
     
     /**
@@ -357,7 +358,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             // If network is available sync the stock and news
             if(isNetworkAvailable()){
                 // Sync the stocks
-                mStockSyncMan.syncForce(symbols);
+                mStockSyncMan.sync(symbols);
                 // Sync the news
                 syncNews();
             }
@@ -376,10 +377,11 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 dbAdapter.deleteItemsOlderThan(Constants.RETENTION_IN_DAYS); // x days
                 dbAdapter.close();
             }
-            
-            syncNews();
-            
-            // Create and start timer thread 
+        }
+        
+        // Create and start timer thread 
+        if (null == mTimerThread
+                || mTimerThread.getState() == Thread.State.TERMINATED) {
             mTimerThread = new Thread(new TimerRunnable(new Handler(mTimerCallback)));
             mTimerThread.start();
         }
@@ -428,8 +430,10 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
         @Override
         public boolean handleMessage(Message msg) {
             Log.v(TAG, "Timer callback entered");
+            syncNews();
             syncStocks();
             return false;
+            // TODO This message must be subscribed by MarkgetActivity to sync the graph
         }
     };
     
