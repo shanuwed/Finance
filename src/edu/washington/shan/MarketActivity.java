@@ -98,6 +98,8 @@ public class MarketActivity extends ListActivity {
      */
     @Override
     protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).
+        unregisterReceiver(refreshBroadcastReceiver);
         mDbAdapter.close();
         super.onDestroy();
     }
@@ -231,10 +233,14 @@ public class MarketActivity extends ListActivity {
     }
     
     private void refreshImage() {
+        Log.v(TAG, "refreshImage");
+        
         if (mDownloadTask.getStatus() == AsyncTask.Status.FINISHED) {
             mDownloadTask = new ImageDownloadTask(this);
             mDownloadTask
                     .execute("http://www.google.com/finance/chart?cht=c&q=INDEXDJX:.DJI,INDEXSP:.INX,INDEXNASDAQ:.IXIC&tlf=12h");
+        } else {
+            Log.v(TAG, "Image download is already in progress");
         }
     }
     

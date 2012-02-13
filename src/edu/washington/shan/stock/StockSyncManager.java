@@ -38,9 +38,7 @@ public class StockSyncManager implements AsyncTaskCompleteListener<String> {
      * @param symbols
      */
     public void sync(String... symbols){
-        Log.v(TAG, "attempting to sync");
-        
-        Log.v(TAG, "downloadStockData");
+        Log.v(TAG, "sync");
         
         if (mDownloadTask == null
                 || mDownloadTask.getStatus() == AsyncTask.Status.FINISHED) {

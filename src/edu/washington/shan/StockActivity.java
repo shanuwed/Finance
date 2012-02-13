@@ -61,6 +61,8 @@ public class StockActivity extends ListActivity {
      */
     @Override
     protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).
+        unregisterReceiver(refreshBroadcastReceiver);
         mDbAdapter.close();
         super.onDestroy();
     }
