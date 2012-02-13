@@ -228,7 +228,15 @@ public class MarketActivity extends ListActivity {
         } catch (java.lang.RuntimeException e) {
             Log.e(TAG, "Exception in fillData", e);
         }
-    }    
+    }
+    
+    private void refreshImage() {
+        if (mDownloadTask.getStatus() == AsyncTask.Status.FINISHED) {
+            mDownloadTask = new ImageDownloadTask(this);
+            mDownloadTask
+                    .execute("http://www.google.com/finance/chart?cht=c&q=INDEXDJX:.DJI,INDEXSP:.INX,INDEXNASDAQ:.IXIC&tlf=12h");
+        }
+    }
     
     /**
      * Upon receiving a broadcast message,
@@ -244,6 +252,7 @@ public class MarketActivity extends ListActivity {
             {
                 Log.v(TAG, "RefreshBroadcastReceiver for market");
                 fillData();
+                refreshImage();
             }
         }
     }

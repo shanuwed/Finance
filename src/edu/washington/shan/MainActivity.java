@@ -30,7 +30,6 @@ import edu.washington.shan.news.Constants;
 import edu.washington.shan.news.NewsSyncManager;
 import edu.washington.shan.news.PrefKeyManager;
 import edu.washington.shan.news.SubscriptionPrefActivity;
-import edu.washington.shan.news.WorkerThreadRunnable;
 import edu.washington.shan.stock.DBConstants;
 import edu.washington.shan.stock.StockSyncManager;
 
@@ -58,8 +57,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
     private NewsSyncManager mNewsSyncMan;
     private PrefKeyManager mPrefKeyManager;
     
-    private Thread mTimerThread;
-
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -338,6 +335,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
      * Run first time initialization after the install
      */
     private void initialize() {
+        final String initKey = "finance_initialized";
         // Use these stock symbols during the first run after install
         final String[] symbols = 
             new String[]{"IBM","MSFT","YHOO","GOOG","AMZN",".DJI",".INX",".IXIC"};
@@ -347,7 +345,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 MODE_PRIVATE);
         
         // is this the first time running the app?
-        if(!sharedPref.getBoolean("initialized", false)) {
+        if(!sharedPref.getBoolean(initKey, false)) {
             
             // Create preferences like <boolean name="usmarkets" value="true" />
             // so that we can download RSS news feeds for them.
@@ -364,7 +362,7 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
             }
             
             showAboutDialogBox();
-            setPreference("initialized", true);// Clear 'first time run' flag
+            setPreference(initKey, true);// Clear 'first time run' flag
             
         }else{
             
@@ -377,13 +375,6 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 dbAdapter.deleteItemsOlderThan(Constants.RETENTION_IN_DAYS); // x days
                 dbAdapter.close();
             }
-        }
-        
-        // Create and start timer thread 
-        if (null == mTimerThread
-                || mTimerThread.getState() == Thread.State.TERMINATED) {
-            mTimerThread = new Thread(new TimerRunnable(new Handler(mTimerCallback)));
-            mTimerThread.start();
         }
     }
     
@@ -421,55 +412,5 @@ public class MainActivity extends TabActivity  implements AsyncTaskCompleteListe
                 dialog.cancel();
             }
         }).show();
-    }
-      
-    /**
-     * Timer callback 
-     */
-    private Handler.Callback mTimerCallback = new Handler.Callback() {
-        @Override
-        public boolean handleMessage(Message msg) {
-            Log.v(TAG, "Timer callback entered");
-            syncNews();
-            syncStocks();
-            return false;
-            // TODO This message must be subscribed by MarkgetActivity to sync the graph
-        }
-    };
-    
-    /**
-     * Background timer thread to sync stocks in a regular interval
-     *
-     */
-    private class TimerRunnable implements Runnable {
-        private static final String TAG = "TimerRunnable";
-        private Handler mHandler;
-        
-        public TimerRunnable(Handler handler){
-            mHandler = handler;
-        }
-
-        @Override
-        public void run() {
-            try {
-                while (true) {
-                    // is automatic sync turned on?
-                    SharedPreferences sharedPref = getSharedPreferences(
-                            getResources().getString(R.string.pref_filename),
-                            MODE_PRIVATE);
-                    if (sharedPref.getBoolean(getResources().getString(
-                            R.string.settings_auto_sync_key), false)) {
-                        if (mHandler != null) {
-                            Message msg = mHandler.obtainMessage();
-                            msg.setData(new Bundle());
-                            mHandler.sendMessage(msg);
-                        }
-                    }
-                    Thread.sleep(4 * 60 * 1000); // 4 minutes
-                }
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Caught exception", e);
-            }
-        }
     }
 }

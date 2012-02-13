@@ -14,10 +14,10 @@
 	        android:title="@string/settings_saving_policy_title"
 	        android:summary="@string/settings_saving_policy_summary" />
 	    
-	    <CheckBoxPreference
+	    <!--CheckBoxPreference
 	        android:key="settings_auto_sync"
 	        android:title="@string/settings_sync_title"
-	        android:summary="@string/settings_sync_summary" />
+	        android:summary="@string/settings_sync_summary" /-->
 	    
         <CheckBoxPreference
             android:key="settings_use_external_browser"
